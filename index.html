@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#050D1A">
+  <title>ช่วยน้ำท่วม — ระบบแจ้งเหตุฉุกเฉิน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    :root {
+      --bg0: #050D1A;
+      --bg1: #080E1A;
+      --bg2: #0C1A30;
+      --bg3: #0F2040;
+      --bg4: #152848;
+      --red: #E8380C;
+      --blue: #0EA5E9;
+      --amber: #F59E0B;
+      --green: #059669;
+      --t0: #F0F9FF;
+      --t1: #8BA3BC;
+      --t2: #4A6080;
+      --b0: rgba(14, 165, 233, .15);
+      --b1: rgba(14, 165, 233, .25)
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg0);
+      font-family: 'Sarabun', sans-serif;
+      color: var(--t0);
+      overflow: hidden
+    }
+
+    /* ── DESKTOP WRAPPER ── */
+    @media(min-width:600px) {
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2rem;
+        overflow-y: auto;
+        background: #020810
+      }
+
+      .shell {
+        height: 844px;
+        border-radius: 44px;
+        border: 2px solid #1A2A48;
+        box-shadow: 0 40px 120px rgba(0, 0, 0, .8), 0 0 60px rgba(14, 165, 233, .06)
+      }
+    }
+
+    /* ── SHELL ── */
+    .shell {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      /* fallback สำหรับเบราว์เซอร์เก่า */
+      height: 100dvh;
+      /* ความสูงจริงของพื้นที่แสดงผลบนมือถือ ไม่ถูกบังคับด้วยขนาด viewport ตอนเบราว์เซอร์ซ่อนแถบ address bar */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg1)
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      background: var(--bg0);
+      padding: max(env(safe-area-inset-top), 14px) 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--b0)
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo-ico {
+      width: 36px;
+      height: 36px;
+      background: var(--red);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .logo-ico .ti {
+      font-size: 18px;
+      color: white
+    }
+
+    .logo-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--t0);
+      line-height: 1.2
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--t1)
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(232, 56, 12, .1);
+      border: 1px solid rgba(232, 56, 12, .3);
+      border-radius: 100px;
+      padding: 4px 12px
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .35;
+        transform: scale(.65)
+      }
+    }
+
+    .pill span {
+      font-size: 12px;
+      font-weight: 700;
+      color: #F87A60
+    }
+
+    /* ── TICKER ── */
+    .ticker {
+      background: rgba(232, 56, 12, .07);
+      border-bottom: 1px solid rgba(232, 56, 12, .18);
+      padding: 5px 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      height: 27px
+    }
+
+    .ticker-inner {
+      white-space: nowrap;
+      display: inline-block;
+      animation: tick 30s linear infinite
+    }
+
+    .ticker-inner span {
+      font-size: 11.5px;
+      color: #F8C4B4;
+      padding: 0 40px
+    }
+
+    @keyframes tick {
+      0% {
+        transform: translateX(100vw)
+      }
+
+      100% {
+        transform: translateX(-100%)
+      }
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      scrollbar-width: none
+    }
+
+    .content::-webkit-scrollbar {
+      display: none
+    }
+
+    /* ── PAGES ── */
+    .page {
+      display: none;
+      animation: pgIn .22s ease;
+      padding-bottom: 30px
+    }
+
+    .page.active {
+      display: block
+    }
+
+    @keyframes pgIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ══════════════════════════════════════
+   PAGE 1 — EMERGENCY
+══════════════════════════════════════ */
+
+    /* Water Level Card */
+    .wl-card {
+      margin: 14px;
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 18px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .wl-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 32%;
+      background: linear-gradient(to top, rgba(14, 165, 233, .05), transparent);
+      pointer-events: none
+    }
+
+    .wl-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px
+    }
+
+    .wl-sub {
+      font-size: 10px;
+      color: var(--t1);
+      font-weight: 600;
+      letter-spacing: .5px;
+      margin-bottom: 2px
+    }
+
+    .wl-main {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--t0)
+    }
+
+    .danger-badge {
+      background: rgba(232, 56, 12, .12);
+      border: 1px solid rgba(232, 56, 12, .35);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #F87A60
+    }
+
+    .bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0EA5E9, #F59E0B 60%, #E8380C);
+      border-radius: 10px;
+      width: 0%;
+      transition: width 2s cubic-bezier(.4, 0, .2, 1);
+      position: relative
+    }
+
+    .bar-fill::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      top: -3px;
+      width: 4px;
+      height: 16px;
+      background: white;
+      border-radius: 2px;
+      opacity: .7
+    }
+
+    .wl-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      position: relative;
+      z-index: 1
+    }
+
+    .wl-stat {
+      text-align: center
+    }
+
+    .wl-val {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.1
+    }
+
+    .wl-lbl {
+      font-size: 10px;
+      color: var(--t1);
+      margin-top: 1px
+    }
+
+    .cv-blue {
+      color: var(--blue)
+    }
+
+    .cv-amber {
+      color: var(--amber)
+    }
+
+    .cv-white {
+      color: var(--t0)
+    }
+
+    /* SOS section */
+    .sos-sec {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 16px
+    }
+
+    .sos-wrap {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid rgba(232, 56, 12, .55);
+      animation: ring 2.5s ease-out infinite
+    }
+
+    .ring:nth-child(1) {
+      animation-delay: 0s
+    }
+
+    .ring:nth-child(2) {
+      animation-delay: .85s
+    }
+
+    .ring:nth-child(3) {
+      animation-delay: 1.7s
+    }
+
+    @keyframes ring {
+      0% {
+        transform: scale(.46);
+        opacity: 1
+      }
+
+      100% {
+        transform: scale(1.05);
+        opacity: 0
+      }
+    }
+
+    .sos-btn {
+      width: 130px;
+      height: 130px;
+      background: var(--red);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+      z-index: 2;
+      transition: transform .12s, background .15s;
+      box-shadow: 0 0 0 5px rgba(232, 56, 12, .14)
+    }
+
+    .sos-btn:active {
+      transform: scale(.93);
+      background: #C42E0A
+    }
+
+    .sos-lbl {
+      font-size: 28px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 4px;
+      line-height: 1
+    }
+
+    .sos-sub {
+      font-size: 10px;
+      color: rgba(255, 255, 255, .85);
+      font-weight: 500;
+      letter-spacing: .3px
+    }
+
+    .sos-hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--t1);
+      text-align: center
+    }
+
+    /* Contact grid */
+    .sec-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t2);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 0 14px;
+      margin-bottom: 10px
+    }
+
+    .contacts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 14px 14px
+    }
+
+    .cc {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: background .15s, border-color .15s;
+      cursor: pointer
+    }
+
+    .cc:active {
+      background: var(--bg4);
+      border-color: var(--b1)
+    }
+
+    .cc-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .cc-ico .ti {
+      font-size: 19px
+    }
+
+    .ico-r {
+      background: rgba(232, 56, 12, .12)
+    }
+
+    .ico-r .ti {
+      color: #F87A60
+    }
+
+    .ico-a {
+      background: rgba(245, 158, 11, .12)
+    }
+
+    .ico-a .ti {
+      color: #FBBF24
+    }
+
+    .ico-b {
+      background: rgba(14, 165, 233, .1)
+    }
+
+    .ico-b .ti {
+      color: #38BDF8
+    }
+
+    .ico-g {
+      background: rgba(5, 150, 105, .12)
+    }
+
+    .ico-g .ti {
+      color: #34D399
+    }
+
+    .cc-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--t0);
+      line-height: 1
+    }
+
+    .cc-name {
+      font-size: 10px;
+      color: var(--t1);
+      margin-top: 1px
+    }
+
+    /* Safe button */
+    .safe-btn {
+      margin: 0 14px 20px;
+      width: calc(100% - 28px);
+      background: var(--bg3);
+      border: 1.5px solid var(--green);
+      border-radius: 16px;
+      padding: 15px;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #34D399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s
+    }
+
+    .safe-btn:active {
+      background: rgba(5, 150, 105, .1)
+    }
+
+    .safe-btn .ti {
+      font-size: 20px
+    }
+
+    /* ══════════════════════════════════════
+   PAGE 2 — REPORT
+══════════════════════════════════════ */
+    .form-wrap {
+      padding: 14px
+    }
+
+    .pg-head {
+      margin-bottom: 14px
+    }
+
+    .pg-head h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--t0);
+      margin-bottom: 3px
+    }
+
+    .pg-head p {
+      font-size: 13px;
+      color: var(--t1)
+    }
+
+    .fc {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 10px
+    }
+
+    .flbl {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t1);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 10px
+    }
+
+    /* Counter */
+    .counter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, .04);
+      border-radius: 12px;
+      padding: 4px
+    }
+
+    .cbtn {
+      width: 52px;
+      height: 52px;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid var(--b0);
+      border-radius: 10px;
+      color: var(--t0);
+      font-size: 26px;
+      cursor: pointer;
+      font-weight: 300;
+      font-family: inherit;
+      transition: background .15s
+    }
+
+    .cbtn:active {
+      background: rgba(255, 255, 255, .13)
+    }
+
+    .cval {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--blue)
+    }
+
+    /* Inputs */
+    .inp {
+      width: 100%;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--b0);
+      border-radius: 12px;
+      padding: 13px 14px;
+      color: var(--t0);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .inp:focus {
+      border-color: var(--blue)
+    }
+
+    .inp::placeholder {
+      color: var(--t2)
+    }
+
+    textarea.inp {
+      resize: none;
+      min-height: 90px;
+      line-height: 1.6
+    }
+
+    .gps-btn {
+      width: 100%;
+      margin-top: 8px;
+      background: rgba(14, 165, 233, .08);
+      border: 1px solid rgba(14, 165, 233, .25);
+      border-radius: 10px;
+      padding: 11px;
+      color: var(--blue);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background .15s
+    }
+
+    .gps-btn:active {
+      background: rgba(14, 165, 233, .15)
+    }
+
+    .gps-btn .ti {
+      font-size: 16px
+    }
+
+    /* Chips */
+    .chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, .04);
+      border: 1.5px solid var(--b0);
+      border-radius: 10px;
+      padding: 11px 10px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t1);
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all .15s
+    }
+
+    .chip:active,
+    .chip.sel {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(14, 165, 233, .08)
+    }
+
+    .chip .ti {
+      font-size: 15px
+    }
+
+    /* Submit */
+    .sub-btn {
+      width: 100%;
+      background: var(--red);
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+      box-shadow: 0 6px 28px rgba(232, 56, 12, .28);
+      transition: transform .1s, box-shadow .1s, background .15s
+    }
+
+    .sub-btn:active {
+      transform: scale(.97);
+      box-shadow: 0 3px 14px rgba(232, 56, 12, .18)
+    }
+
+    .sub-btn .ti {
+      font-size: 20px
+    }
+
+    /* ══════════════════════════════════════
+   PAGE 3 — ALERTS
+══════════════════════════════════════ */
+    .pg-pad {
+      padding: 14px 14px 6px
+    }
+
+    .pg-pad h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--t0);
+      margin-bottom: 3px
+    }
+
+    .pg-pad p {
+      font-size: 13px;
+      color: var(--t1)
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      padding: 4px 14px 12px;
+      overflow-x: auto;
+      scrollbar-width: none
+    }
+
+    .filters::-webkit-scrollbar {
+      display: none
+    }
+
+    .fc-chip {
+      white-space: nowrap;
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      color: var(--t1);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .fc-chip.on {
+      background: rgba(14, 165, 233, .1);
+      border-color: var(--blue);
+      color: var(--blue)
+    }
+
+    .alist {
+      padding: 0 14px
+    }
+
+    .ai {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .ai::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px
+    }
+
+    .ai.crit::before {
+      background: var(--red)
+    }
+
+    .ai.warn::before {
+      background: var(--amber)
+    }
+
+    .ai.info::before {
+      background: var(--blue)
+    }
+
+    .ai-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px
+    }
+
+    .abadge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 5px
+    }
+
+    .ab-c {
+      background: rgba(232, 56, 12, .12);
+      border: 1px solid rgba(232, 56, 12, .3);
+      color: #F87A60
+    }
+
+    .ab-w {
+      background: rgba(245, 158, 11, .12);
+      border: 1px solid rgba(245, 158, 11, .3);
+      color: #FBBF24
+    }
+
+    .ab-i {
+      background: rgba(14, 165, 233, .1);
+      border: 1px solid rgba(14, 165, 233, .25);
+      color: #38BDF8
+    }
+
+    .atime {
+      font-size: 11px;
+      color: var(--t2);
+      margin-left: auto
+    }
+
+    .atitle {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--t0)
+    }
+
+    .abody {
+      font-size: 12.5px;
+      color: var(--t1);
+      line-height: 1.65
+    }
+
+    /* ══════════════════════════════════════
+   PAGE 4 — SHELTERS
+══════════════════════════════════════ */
+    .slist {
+      padding: 0 14px
+    }
+
+    .sc {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start
+    }
+
+    .sc.full {
+      opacity: .52
+    }
+
+    .sdot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px
+    }
+
+    .sdot.open {
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(5, 150, 105, .5)
+    }
+
+    .sdot.full {
+      background: var(--red)
+    }
+
+    .si {
+      flex: 1;
+      min-width: 0
+    }
+
+    .sname {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t0);
+      margin-bottom: 2px
+    }
+
+    .sloc {
+      font-size: 11px;
+      color: var(--t1);
+      margin-bottom: 7px
+    }
+
+    .stags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px
+    }
+
+    .stag {
+      background: rgba(14, 165, 233, .07);
+      border: 1px solid rgba(14, 165, 233, .18);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 10px;
+      color: #38BDF8
+    }
+
+    .stag.ftag {
+      background: rgba(232, 56, 12, .07);
+      border-color: rgba(232, 56, 12, .2);
+      color: #F87A60
+    }
+
+    .capbar {
+      height: 4px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 4px
+    }
+
+    .capfill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 1.6s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .cap-g {
+      background: var(--green)
+    }
+
+    .cap-a {
+      background: var(--amber)
+    }
+
+    .cap-r {
+      background: var(--red)
+    }
+
+    .capt {
+      font-size: 10px;
+      color: var(--t2)
+    }
+
+    .sdist {
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .sdval {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--blue)
+    }
+
+    .sdval.dim {
+      color: var(--t1)
+    }
+
+    .sdunit {
+      font-size: 10px;
+      color: var(--t1)
+    }
+
+    /* ══════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════ */
+    .bnav {
+      background: var(--bg0);
+      border-top: 1px solid var(--b0);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 0 max(env(safe-area-inset-bottom), 16px);
+      flex-shrink: 0
+    }
+
+    .nbtn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 4px 2px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      position: relative
+    }
+
+    .nbtn .ti {
+      font-size: 25px;
+      color: var(--t2);
+      transition: color .2s
+    }
+
+    .nbtn .nlbl {
+      font-size: 10px;
+      color: var(--t2);
+      font-weight: 600;
+      transition: color .2s
+    }
+
+    .nbtn.on .ti,
+    .nbtn.on .nlbl {
+      color: var(--blue)
+    }
+
+    .nbadge {
+      position: absolute;
+      top: 2px;
+      right: calc(50% - 24px);
+      background: var(--red);
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px
+    }
+
+    /* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+    .toast {
+      position: absolute;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%) translateY(18px);
+      background: var(--green);
+      color: white;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 11px 22px;
+      border-radius: 100px;
+      opacity: 0;
+      transition: opacity .28s, transform .28s;
+      z-index: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      max-width: 92%;
+      text-align: center
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    /* ══════════════════════════════════════
+   SOS MODAL
+══════════════════════════════════════ */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 10, 22, .92);
+      z-index: 400;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      text-align: center;
+      padding: 32px;
+      animation: pgIn .3s ease
+    }
+
+    .overlay.show {
+      display: flex
+    }
+
+    .ov-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: ring 2s ease-out infinite
+    }
+
+    .ov-ring .ti {
+      font-size: 50px;
+      color: var(--red)
+    }
+
+    .ov-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--t0)
+    }
+
+    .ov-body {
+      font-size: 14px;
+      color: var(--t1);
+      line-height: 1.65;
+      max-width: 280px
+    }
+
+    .ov-confirm {
+      background: var(--red);
+      border: none;
+      border-radius: 100px;
+      padding: 14px 32px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(232, 56, 12, .3);
+      transition: transform .1s
+    }
+
+    .ov-confirm:active {
+      transform: scale(.97)
+    }
+
+    .ov-cancel {
+      background: transparent;
+      border: 1px solid var(--b0);
+      border-radius: 100px;
+      padding: 12px 28px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      color: var(--t1);
+      cursor: pointer;
+      transition: border-color .15s
+    }
+
+    .ov-cancel:active {
+      border-color: var(--b1)
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="shell">
+
+    <!-- HEADER -->
+    <header class="hdr">
+      <div class="logo">
+        <div class="logo-ico"><i class="ti ti-waves"></i></div>
+        <div>
+          <div class="logo-name">ช่วยน้ำท่วม</div>
+          <div class="logo-sub">ระบบแจ้งเหตุฉุกเฉิน</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-dot"></div>
+        <span>ระดับ 3 วิกฤต</span>
+      </div>
+    </header>
+
+    <!-- TICKER -->
+    <div class="ticker" role="marquee" aria-label="ข่าวด่วน">
+      <div class="ticker-inner">
+        <span>⚠ ระดับน้ำแม่น้ำชีสูงวิกฤต — อ.เมืองขอนแก่น ให้อพยพทันที &nbsp;|&nbsp; ถนน ขก.–มหาสารคาม น้ำท่วมสูง
+          งดสัญจร &nbsp;|&nbsp; เขื่อนอุบลรัตน์ระบายน้ำเพิ่มจาก 50→80 ล้าน ลบ.ม./วัน &nbsp;|&nbsp;
+          พยากรณ์ฝนตกหนักมากพิเศษ 6 อำเภอ จ.ขอนแก่น</span>
+      </div>
+    </div>
+
+    <!-- ═══ CONTENT ═══ -->
+    <main class="content" id="ca">
+
+      <!-- ════ PAGE: ฉุกเฉิน ════ -->
+      <div id="pg-e" class="page active">
+
+        <!-- Water Level Card -->
+        <div class="wl-card">
+          <div class="wl-top">
+            <div>
+              <div class="wl-sub">สถานการณ์น้ำท่วม</div>
+              <div class="wl-main">จังหวัดขอนแก่น</div>
+            </div>
+            <div class="danger-badge">⚠ อันตราย</div>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="wl" data-w="78"></div>
+          </div>
+          <div class="wl-stats">
+            <div class="wl-stat">
+              <div class="wl-val cv-blue">3.2 ม.</div>
+              <div class="wl-lbl">สูงกว่าปกติ</div>
+            </div>
+            <div class="wl-stat">
+              <div class="wl-val cv-amber">+0.4</div>
+              <div class="wl-lbl">ม./ชั่วโมง</div>
+            </div>
+            <div class="wl-stat">
+              <div class="wl-val cv-white">7 อ.</div>
+              <div class="wl-lbl">อำเภอที่ได้รับผล</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOS -->
+        <div class="sos-sec">
+          <div class="sos-wrap">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <button class="sos-btn" onclick="openSOS()" aria-label="ปุ่ม SOS ขอความช่วยเหลือฉุกเฉิน">
+              <span class="sos-lbl">SOS</span>
+              <span class="sos-sub">ขอความช่วยเหลือ</span>
+            </button>
+          </div>
+          <div class="sos-hint">กดปุ่มเพื่อแจ้งเหตุฉุกเฉินทันที</div>
+        </div>
+
+        <!-- Quick Contacts -->
+        <div class="sec-lbl">สายด่วน — กดโทรได้เลย</div>
+        <div class="contacts">
+          <a href="tel:191" class="cc" aria-label="โทร 191 ตำรวจ">
+            <div class="cc-ico ico-r"><i class="ti ti-shield-filled"></i></div>
+            <div>
+              <div class="cc-num">191</div>
+              <div class="cc-name">ตำรวจ/ฉุกเฉิน</div>
+            </div>
+          </a>
+          <a href="tel:1669" class="cc" aria-label="โทร 1669 กู้ชีพ">
+            <div class="cc-ico ico-a"><i class="ti ti-ambulance"></i></div>
+            <div>
+              <div class="cc-num">1669</div>
+              <div class="cc-name">กู้ชีพฉุกเฉิน</div>
+            </div>
+          </a>
+          <a href="tel:1784" class="cc" aria-label="โทร 1784 ชลประทาน">
+            <div class="cc-ico ico-b"><i class="ti ti-droplet-filled"></i></div>
+            <div>
+              <div class="cc-num">1784</div>
+              <div class="cc-name">ชลประทาน</div>
+            </div>
+          </a>
+          <a href="tel:1111" class="cc" aria-label="โทร 1111 สายด่วนรัฐบาล">
+            <div class="cc-ico ico-g"><i class="ti ti-building"></i></div>
+            <div>
+              <div class="cc-num">1111</div>
+              <div class="cc-name">สายด่วนรัฐบาล</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Safe -->
+        <button class="safe-btn" id="sfbtn" onclick="markSafe()">
+          <i class="ti ti-circle-check"></i>
+          ฉันปลอดภัยแล้ว — แจ้งญาติ
+        </button>
+      </div>
+
+      <!-- ════ PAGE: แจ้งเหตุ ════ -->
+      <div id="pg-r" class="page">
+        <div class="form-wrap">
+          <div class="pg-head">
+            <h2>📍 แจ้งเหตุขอความช่วยเหลือ</h2>
+            <p>กรอกข้อมูลให้เจ้าหน้าที่เข้าช่วยได้เร็วขึ้น</p>
+          </div>
+
+          <div class="fc">
+            <label class="flbl">จำนวนคนที่ต้องการช่วยเหลือ</label>
+            <div class="counter">
+              <button class="cbtn" onclick="cnt(-1)" aria-label="ลดจำนวน">−</button>
+              <span class="cval" id="ppl">2</span>
+              <button class="cbtn" onclick="cnt(1)" aria-label="เพิ่มจำนวน">+</button>
+            </div>
+          </div>
+
+          <div class="fc">
+            <label class="flbl" for="loc">ที่อยู่ / ตำแหน่งของคุณ</label>
+            <input type="text" id="loc" class="inp" placeholder="บ้านเลขที่ หมู่บ้าน ตำบล อำเภอ จังหวัด">
+            <button class="gps-btn" id="gpsbtn" onclick="doGPS()">
+              <i class="ti ti-map-pin"></i> ดึงพิกัด GPS อัตโนมัติ
+            </button>
+          </div>
+
+          <div class="fc">
+            <label class="flbl">ต้องการความช่วยเหลืออะไร?</label>
+            <div class="chips">
+              <button class="chip" onclick="this.classList.toggle('sel')"><i
+                  class="ti ti-sailboat"></i>เรืออพยพ</button>
+              <button class="chip" onclick="this.classList.toggle('sel')"><i class="ti ti-bread"></i>อาหาร/น้ำ</button>
+              <button class="chip" onclick="this.classList.toggle('sel')"><i class="ti ti-pill"></i>ยารักษาโรค</button>
+              <button class="chip" onclick="this.classList.toggle('sel')"><i
+                  class="ti ti-wheelchair"></i>ผู้ป่วย/ผู้สูงอายุ</button>
+              <button class="chip" onclick="this.classList.toggle('sel')"><i class="ti ti-paw"></i>สัตว์เลี้ยง</button>
+              <button class="chip" onclick="this.classList.toggle('sel')"><i class="ti ti-dots"></i>อื่นๆ</button>
+            </div>
+          </div>
+
+          <div class="fc">
+            <label class="flbl" for="tel">เบอร์โทรศัพท์ที่ติดต่อได้</label>
+            <input type="tel" id="tel" class="inp" placeholder="0XX-XXX-XXXX">
+          </div>
+
+          <div class="fc">
+            <label class="flbl" for="note">ข้อความเพิ่มเติม (ถ้ามี)</label>
+            <textarea id="note" class="inp"
+              placeholder="เช่น บ้านถูกน้ำท่วม 1.5 เมตร มีผู้สูงอายุ 2 คน ไม่สามารถเดินได้..."></textarea>
+          </div>
+
+          <button class="sub-btn" id="subbtn" onclick="doSubmit()">
+            <i class="ti ti-send"></i> ส่งคำขอความช่วยเหลือ
+          </button>
+        </div>
+      </div>
+
+      <!-- ════ PAGE: แจ้งเตือน ════ -->
+      <div id="pg-a" class="page">
+        <div class="pg-pad">
+          <h2>🔔 แจ้งเตือนน้ำท่วม</h2>
+          <p>อัพเดตล่าสุด: 5 นาทีที่แล้ว</p>
+        </div>
+        <div class="filters">
+          <button class="fc-chip on" onclick="filterAlert('all',this)">ทั้งหมด</button>
+          <button class="fc-chip" onclick="filterAlert('c',this)">🔴 วิกฤต</button>
+          <button class="fc-chip" onclick="filterAlert('w',this)">🟠 เฝ้าระวัง</button>
+          <button class="fc-chip" onclick="filterAlert('i',this)">🔵 แจ้งเตือน</button>
+          <button class="fc-chip" onclick="filterAlert('road',this)">🚗 การจราจร</button>
+        </div>
+        <div class="alist">
+
+          <div class="ai crit" data-t="c">
+            <div class="ai-meta"><span class="abadge ab-c">🔴 วิกฤต</span><span class="atime">5 นาทีที่แล้ว</span></div>
+            <div class="atitle">ระดับน้ำแม่น้ำชีสูงวิกฤต</div>
+            <div class="abody">อ.เมืองขอนแก่น ระดับน้ำสูงกว่าตลิ่ง 1.8 เมตร คาดว่าจะทะลักเข้าชุมชนภายใน 2 ชั่วโมง
+              ให้ประชาชนอพยพขึ้นที่สูงทันที</div>
+          </div>
+
+          <div class="ai crit" data-t="c">
+            <div class="ai-meta"><span class="abadge ab-c">🔴 วิกฤต</span><span class="atime">18 นาทีที่แล้ว</span>
+            </div>
+            <div class="atitle">ประกาศอพยพ 3 ตำบล</div>
+            <div class="abody">ต.บ้านทุ่ม ต.โคกสี ต.พระลับ ให้ประชาชนอพยพไปยังศูนย์พักพิงที่จัดเตรียมไว้
+              เจ้าหน้าที่พร้อมให้ความช่วยเหลือ 24 ชั่วโมง</div>
+          </div>
+
+          <div class="ai warn" data-t="w">
+            <div class="ai-meta"><span class="abadge ab-w">🟠 เฝ้าระวัง</span><span class="atime">23 นาทีที่แล้ว</span>
+            </div>
+            <div class="atitle">พยากรณ์ฝนตกหนักมาก</div>
+            <div class="abody">กรมอุตุนิยมวิทยาคาดการณ์ฝนตกหนักมากถึงหนักมากพิเศษใน 6 อำเภอของ จ.ขอนแก่น ในช่วง 12–24
+              ชั่วโมงข้างหน้า</div>
+          </div>
+
+          <div class="ai warn" data-t="w">
+            <div class="ai-meta"><span class="abadge ab-w">🟠 เฝ้าระวัง</span><span class="atime">1
+                ชั่วโมงที่แล้ว</span></div>
+            <div class="atitle">เขื่อนอุบลรัตน์ระบายน้ำเพิ่ม</div>
+            <div class="abody">จะระบายน้ำเพิ่มจาก 50 ล้าน ลบ.ม./วัน เป็น 80 ล้าน ลบ.ม./วัน ตั้งแต่ 18:00 น.
+              วันนี้เป็นต้นไป</div>
+          </div>
+
+          <div class="ai info" data-t="road">
+            <div class="ai-meta"><span class="abadge ab-i">🔵 แจ้งเตือน</span><span class="atime">2
+                ชั่วโมงที่แล้ว</span></div>
+            <div class="atitle">ถนน ขก.–มหาสารคาม น้ำท่วมสูง</div>
+            <div class="abody">ทางหลวงหมายเลข 2 ช่วง กม.38-45 น้ำท่วมสูง 0.8 เมตร งดการสัญจร แนะนำใช้เส้นทาง กม.22 แทน
+            </div>
+          </div>
+
+          <div class="ai info" data-t="i">
+            <div class="ai-meta"><span class="abadge ab-i">🔵 แจ้งเตือน</span><span class="atime">3
+                ชั่วโมงที่แล้ว</span></div>
+            <div class="atitle">เปิดศูนย์รับบริจาคสิ่งของ</div>
+            <div class="abody">อบจ.ขอนแก่น เปิดศูนย์รับบริจาค ณ ที่ว่าการ อ.เมือง ทุกวัน 08:00–20:00 น. ต้องการ น้ำดื่ม
+              อาหารกระป๋อง เสื้อผ้า และยา</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ════ PAGE: ที่พักพิง ════ -->
+      <div id="pg-s" class="page">
+        <div class="pg-pad">
+          <h2>🏠 ศูนย์พักพิง</h2>
+          <p>เปิดรับผู้ประสบภัยน้ำท่วม</p>
+        </div>
+        <div class="slist">
+
+          <div class="sc">
+            <div class="sdot open"></div>
+            <div class="si">
+              <div class="sname">โรงเรียนชุมชนบ้านทุ่ม</div>
+              <div class="sloc">ต.บ้านทุ่ม อ.เมือง จ.ขอนแก่น</div>
+              <div class="stags">
+                <span class="stag">🍚 อาหาร</span><span class="stag">💊 ยา</span><span class="stag">💡 ไฟฟ้า</span><span
+                  class="stag">🚿 ห้องน้ำ</span>
+              </div>
+              <div class="capbar">
+                <div class="capfill cap-g" data-w="80"></div>
+              </div>
+              <div class="capt">รับได้อีก 60 คน (240/300)</div>
+            </div>
+            <div class="sdist">
+              <div class="sdval">2.1</div>
+              <div class="sdunit">กม.</div>
+            </div>
+          </div>
+
+          <div class="sc">
+            <div class="sdot open"></div>
+            <div class="si">
+              <div class="sname">วัดป่าสามแยก</div>
+              <div class="sloc">ต.โคกสี อ.เมือง จ.ขอนแก่น</div>
+              <div class="stags">
+                <span class="stag">🍚 อาหาร</span><span class="stag">🚰 น้ำดื่ม</span>
+              </div>
+              <div class="capbar">
+                <div class="capfill cap-a" data-w="43"></div>
+              </div>
+              <div class="capt">รับได้อีก 85 คน (65/150)</div>
+            </div>
+            <div class="sdist">
+              <div class="sdval">3.7</div>
+              <div class="sdunit">กม.</div>
+            </div>
+          </div>
+
+          <div class="sc">
+            <div class="sdot open"></div>
+            <div class="si">
+              <div class="sname">ศูนย์กีฬาเทศบาลนครขอนแก่น</div>
+              <div class="sloc">ถ.มิตรภาพ อ.เมือง จ.ขอนแก่น</div>
+              <div class="stags">
+                <span class="stag">🍚 อาหาร</span><span class="stag">💊 ยา</span><span class="stag">💡 ไฟฟ้า</span><span
+                  class="stag">📶 WiFi</span><span class="stag">🐾 รับสัตว์เลี้ยง</span>
+              </div>
+              <div class="capbar">
+                <div class="capfill cap-a" data-w="70"></div>
+              </div>
+              <div class="capt">รับได้อีก 150 คน (350/500)</div>
+            </div>
+            <div class="sdist">
+              <div class="sdval">4.9</div>
+              <div class="sdunit">กม.</div>
+            </div>
+          </div>
+
+          <div class="sc full">
+            <div class="sdot full"></div>
+            <div class="si">
+              <div class="sname">ศาลาประชาคม อ.เมือง</div>
+              <div class="sloc">ถ.กลางเมือง อ.เมือง จ.ขอนแก่น</div>
+              <div class="stags"><span class="stag ftag">🔴 เต็มแล้ว ไม่รับเพิ่ม</span></div>
+              <div class="capbar">
+                <div class="capfill cap-r" data-w="100"></div>
+              </div>
+              <div class="capt">เต็ม (200/200)</div>
+            </div>
+            <div class="sdist">
+              <div class="sdval dim">5.2</div>
+              <div class="sdunit">กม.</div>
+            </div>
+          </div>
+
+          <div class="sc">
+            <div class="sdot open"></div>
+            <div class="si">
+              <div class="sname">วิทยาลัยเทคนิคขอนแก่น</div>
+              <div class="sloc">ถ.ศรีจันทร์ อ.เมือง จ.ขอนแก่น</div>
+              <div class="stags">
+                <span class="stag">🍚 อาหาร</span><span class="stag">💊 ยา</span><span class="stag">💡 ไฟฟ้า</span><span
+                  class="stag">📶 WiFi</span><span class="stag">🏥 พยาบาล</span>
+              </div>
+              <div class="capbar">
+                <div class="capfill cap-g" data-w="35"></div>
+              </div>
+              <div class="capt">รับได้อีก 325 คน (175/500)</div>
+            </div>
+            <div class="sdist">
+              <div class="sdval">6.8</div>
+              <div class="sdunit">กม.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main><!-- /content -->
+
+    <!-- ═══ BOTTOM NAV ═══ -->
+    <nav class="bnav" aria-label="เมนูหลัก">
+      <button id="nb-e" class="nbtn on" onclick="nav('e',this)" aria-label="หน้าฉุกเฉิน">
+        <i class="ti ti-sos"></i>
+        <span class="nlbl">ฉุกเฉิน</span>
+      </button>
+      <button id="nb-r" class="nbtn" onclick="nav('r',this)" aria-label="หน้าแจ้งเหตุ">
+        <i class="ti ti-map-pin"></i>
+        <span class="nlbl">แจ้งเหตุ</span>
+      </button>
+      <button id="nb-a" class="nbtn" onclick="nav('a',this)" aria-label="แจ้งเตือน มี 5 ข้อความใหม่">
+        <i class="ti ti-bell"></i>
+        <span class="nlbl">แจ้งเตือน</span>
+        <span class="nbadge" id="badge">5</span>
+      </button>
+      <button id="nb-s" class="nbtn" onclick="nav('s',this)" aria-label="หน้าที่พักพิง">
+        <i class="ti ti-home"></i>
+        <span class="nlbl">ที่พักพิง</span>
+      </button>
+    </nav>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- SOS OVERLAY -->
+    <div id="ov" class="overlay" role="dialog" aria-modal="true" aria-label="ยืนยัน SOS">
+      <div class="ov-ring"><i class="ti ti-sos"></i></div>
+      <div class="ov-title">ส่ง SOS ขอความช่วยเหลือ?</div>
+      <div class="ov-body">ระบบจะส่งตำแหน่งและข้อมูลของคุณไปยังเจ้าหน้าที่กู้ภัยทันที<br>ใช้เฉพาะกรณีฉุกเฉินเท่านั้น
+      </div>
+      <button class="ov-confirm" onclick="confirmSOS()">🆘 ยืนยัน — ส่ง SOS</button>
+      <button class="ov-cancel" onclick="closeOv()">ยกเลิก</button>
+    </div>
+
+  </div><!-- /shell -->
+
+  <script>
+    /* ── NAV ── */
+    var PAGES = ['e', 'r', 'a', 's'], ppl = 2;
+
+    function nav(id, btn) {
+      PAGES.forEach(function (p) {
+        document.getElementById('pg-' + p).classList.remove('active');
+        document.getElementById('nb-' + p).classList.remove('on');
+      });
+      document.getElementById('pg-' + id).classList.add('active');
+      btn.classList.add('on');
+      document.getElementById('ca').scrollTop = 0;
+      if (id === 's') setTimeout(initCaps, 80);
+      if (id === 'a') { var b = document.getElementById('badge'); if (b) b.style.display = 'none'; }
+    }
+
+    /* ── WATER LEVEL INIT ── */
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var el = document.getElementById('wl');
+        if (el) el.style.width = el.getAttribute('data-w') + '%';
+      }, 350);
+    });
+
+    /* ── CAPACITY BARS ── */
+    function initCaps() {
+      document.querySelectorAll('.capfill[data-w]').forEach(function (b) {
+        b.style.width = b.getAttribute('data-w') + '%';
+      });
+    }
+
+    /* ── SOS ── */
+    function openSOS() {
+      document.getElementById('ov').classList.add('show');
+    }
+    function closeOv() {
+      document.getElementById('ov').classList.remove('show');
+    }
+    function confirmSOS() {
+      closeOv();
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
+      toast('🆘 ส่งสัญญาณ SOS แล้ว! เจ้าหน้าที่กำลังมา...', 5000, '#E8380C');
+      if (navigator.geolocation && window.isSecureContext) {
+        navigator.geolocation.getCurrentPosition(
+          function (p) {
+            var lat = p.coords.latitude.toFixed(5), lng = p.coords.longitude.toFixed(5);
+            setTimeout(function () { toast('📍 ส่งพิกัด ' + lat + ', ' + lng + ' ให้เจ้าหน้าที่แล้ว', 4000, '#0EA5E9'); }, 1200);
+          },
+          function () {
+            setTimeout(function () { toast('⚠ ไม่สามารถดึงพิกัดอัตโนมัติได้ กรุณาแจ้งที่อยู่ทางโทรศัพท์', 4000, '#D97706'); }, 1200);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+      }
+    }
+    document.getElementById('ov').addEventListener('click', function (e) { if (e.target === this) closeOv(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeOv(); });
+
+    /* ── MARK SAFE ── */
+    function markSafe() {
+      var b = document.getElementById('sfbtn');
+      b.style.background = 'rgba(5,150,105,.12)';
+      b.innerHTML = '<i class="ti ti-circle-check" style="font-size:20px"></i> บันทึกแล้ว — ญาติได้รับแจ้งแล้ว';
+      b.style.color = '#34D399';
+      toast('✅ ส่งข้อความแจ้งญาติเรียบร้อยแล้ว', 3000, '#059669');
+    }
+
+    /* ── COUNTER ── */
+    function cnt(d) { ppl = Math.max(1, Math.min(99, ppl + d)); document.getElementById('ppl').textContent = ppl; }
+
+    /* ── GPS ── */
+    function doGPS() {
+      var btn = document.getElementById('gpsbtn');
+
+      // เบราว์เซอร์อนุญาตให้ใช้ Geolocation API เฉพาะบนหน้าเว็บที่โหลดผ่าน HTTPS หรือ localhost เท่านั้น
+      // ถ้าเปิดไฟล์ตรง ๆ (file://) หรือผ่าน HTTP ธรรมดา ฟังก์ชันนี้จะถูกบล็อกทันทีโดยไม่มีข้อความแจ้งเตือนใด ๆ
+      if (!window.isSecureContext) {
+        toast('⚠ ต้องเปิดผ่าน HTTPS หรือ localhost ถึงจะใช้ GPS ได้ (ข้อจำกัดด้านความปลอดภัยของเบราว์เซอร์)', 5000, '#D97706');
+        return;
+      }
+      if (!navigator.geolocation) {
+        toast('เบราว์เซอร์นี้ไม่รองรับ GPS', 2500, '#D97706');
+        return;
+      }
+
+      btn.innerHTML = '<i class="ti ti-loader" style="font-size:16px"></i> กำลังดึงพิกัด GPS...';
+      btn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        function (p) {
+          document.getElementById('loc').value = p.coords.latitude.toFixed(5) + ', ' + p.coords.longitude.toFixed(5);
+          btn.innerHTML = '<i class="ti ti-circle-check" style="font-size:16px"></i> ดึงพิกัด GPS สำเร็จ';
+          btn.style.color = '#34D399'; btn.style.borderColor = 'rgba(5,150,105,.35)';
+          btn.disabled = false;
+          toast('📍 ดึงพิกัด GPS สำเร็จ', 2500, '#059669');
+        },
+        function (err) {
+          btn.innerHTML = '<i class="ti ti-map-pin" style="font-size:16px"></i> ดึงพิกัด GPS อัตโนมัติ';
+          btn.disabled = false;
+          var msg = '⚠ ไม่สามารถดึง GPS ได้ กรอกที่อยู่เอง';
+          if (err && err.code === 1) msg = '⚠ ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง กรุณาอนุญาต GPS ในเบราว์เซอร์';
+          else if (err && err.code === 2) msg = '⚠ ไม่สามารถระบุตำแหน่งได้ (สัญญาณ GPS ไม่ดี) ลองออกไปที่โล่งหรือกรอกที่อยู่เอง';
+          else if (err && err.code === 3) msg = '⚠ ค้นหาตำแหน่งนานเกินไป กรุณาลองใหม่หรือกรอกที่อยู่เอง';
+          toast(msg, 4000, '#D97706');
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    }
+
+    /* ── SUBMIT ── */
+    function doSubmit() {
+      var phone = document.getElementById('tel').value.trim();
+      var loc = document.getElementById('loc').value.trim();
+      if (!phone) { toast('⚠ กรุณากรอกเบอร์โทรศัพท์', 3000, '#D97706'); document.getElementById('tel').focus(); return; }
+      if (!loc) { toast('⚠ กรุณากรอกที่อยู่หรือดึง GPS', 3000, '#D97706'); document.getElementById('loc').focus(); return; }
+      var btn = document.getElementById('subbtn');
+      btn.innerHTML = '<i class="ti ti-loader" style="font-size:20px"></i> กำลังส่ง...';
+      btn.disabled = true;
+      setTimeout(function () {
+        btn.innerHTML = '<i class="ti ti-circle-check" style="font-size:20px"></i> ส่งสำเร็จแล้ว!';
+        btn.style.background = 'var(--green)';
+        btn.style.boxShadow = '0 6px 28px rgba(5,150,105,.28)';
+        toast('✅ ส่งคำขอสำเร็จ! เจ้าหน้าที่จะโทรกลับภายใน 15 นาที', 5000, '#059669');
+        setTimeout(function () {
+          btn.innerHTML = '<i class="ti ti-send" style="font-size:20px"></i> ส่งคำขอความช่วยเหลือ';
+          btn.disabled = false; btn.style.background = 'var(--red)'; btn.style.boxShadow = '0 6px 28px rgba(232,56,12,.28)';
+        }, 4000);
+      }, 1600);
+    }
+
+    /* ── FILTER ALERTS ── */
+    function filterAlert(t, chip) {
+      document.querySelectorAll('.fc-chip').forEach(function (c) { c.classList.remove('on'); });
+      chip.classList.add('on');
+      document.querySelectorAll('.ai').forEach(function (item) {
+        item.style.display = (t === 'all' || item.getAttribute('data-t') === t) ? 'block' : 'none';
+      });
+    }
+
+    /* ── TOAST ── */
+    function toast(msg, dur, bg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg; t.style.background = bg || '#059669';
+      t.classList.add('show');
+      clearTimeout(window._tt);
+      window._tt = setTimeout(function () { t.classList.remove('show'); }, dur || 3000);
+    }
+
+    /* ── CLOCK ── */
+    /* นำแถบเวลาจำลองด้านบนออกแล้ว ไม่ต้องอัปเดตนาฬิกาอีกต่อไป */
+  </script>
+</body>
+
+</html>
