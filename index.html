@@ -13,6 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     * {
@@ -792,6 +794,147 @@
       font-weight: 700;
       color: var(--t1);
       letter-spacing: .3px
+    }
+
+    /* ── MAP (Leaflet) ── */
+    .map-box {
+      width: 100%;
+      height: 220px;
+      border-radius: 16px;
+      border: 1px solid var(--b1);
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: var(--bg2);
+      position: relative;
+      z-index: 0
+    }
+
+    .map-mini {
+      height: 150px;
+      margin-bottom: 12px
+    }
+
+    .map-box .leaflet-container {
+      width: 100%;
+      height: 100%;
+      background: #0A1424;
+      font-family: 'Sarabun', sans-serif
+    }
+
+    /* dark popups + controls */
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: var(--bg3);
+      color: var(--t0);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .5)
+    }
+
+    .leaflet-popup-content {
+      margin: 10px 12px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 12px;
+      line-height: 1.5
+    }
+
+    .leaflet-popup-content b {
+      color: var(--t0)
+    }
+
+    .leaflet-popup-content .pp-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--blue)
+    }
+
+    .leaflet-popup-close-button {
+      color: var(--t1) !important
+    }
+
+    .leaflet-control-zoom a {
+      background: var(--bg3) !important;
+      color: var(--t0) !important;
+      border-color: var(--b0) !important
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(5, 13, 26, .7) !important;
+      color: var(--t2) !important;
+      font-size: 9px !important
+    }
+
+    .leaflet-control-attribution a {
+      color: var(--t1) !important
+    }
+
+    /* custom emoji pin marker */
+    .pin {
+      width: 34px;
+      height: 34px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, .85);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .5)
+    }
+
+    .pin span {
+      transform: rotate(45deg);
+      font-size: 16px;
+      line-height: 1
+    }
+
+    .pin-road {
+      background: #E8380C
+    }
+
+    .pin-bridge {
+      background: #F59E0B
+    }
+
+    .pin-deep {
+      background: #0EA5E9
+    }
+
+    .pin-block {
+      background: #8B5CF6
+    }
+
+    .pin-me {
+      background: #059669
+    }
+
+    .pin-me-pulse {
+      width: 18px;
+      height: 18px;
+      background: #34D399;
+      border: 3px solid rgba(52, 211, 153, .35);
+      border-radius: 50%;
+      box-shadow: 0 0 0 6px rgba(52, 211, 153, .18)
+    }
+
+    /* map legend */
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      padding: 0 4px 14px
+    }
+
+    .lg {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--t1)
+    }
+
+    .lg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0
     }
 
     /* Big "report hazard" launcher button */
@@ -1871,6 +2014,7 @@
             <button class="gps-btn" id="gpsbtn" onclick="doGPS()">
               <i class="ti ti-map-pin"></i> ดึงพิกัด GPS อัตโนมัติ
             </button>
+            <div class="map-box map-mini" id="helpMap" style="display:none;margin-top:10px;margin-bottom:0"></div>
           </div>
 
           <div class="fc">
@@ -1920,6 +2064,14 @@
             </div>
             <div class="crowd-cta-arrow"><i class="ti ti-chevron-right"></i></div>
           </button>
+
+          <div class="map-box" id="crowdMap"></div>
+          <div class="map-legend">
+            <div class="lg"><span class="lg-dot" style="background:#E8380C"></span> ถนนรถเล็กผ่านไม่ได้</div>
+            <div class="lg"><span class="lg-dot" style="background:#F59E0B"></span> สะพานชำรุด</div>
+            <div class="lg"><span class="lg-dot" style="background:#0EA5E9"></span> น้ำท่วมสูง</div>
+            <div class="lg"><span class="lg-dot" style="background:#8B5CF6"></span> เส้นทางปิด</div>
+          </div>
 
           <div class="feed-head">
             <div class="fh-title"><i class="ti ti-users-group"></i> รายงานล่าสุดในพื้นที่</div>
@@ -2259,6 +2411,8 @@
         </button>
       </div>
 
+      <div class="map-box map-mini" id="sheetMap" style="display:none"></div>
+
       <button class="sheet-submit" onclick="submitRep()">
         <i class="ti ti-send"></i> ส่งรายงานเตือนเพื่อนบ้าน
       </button>
@@ -2279,6 +2433,7 @@
       btn.classList.add('on');
       document.getElementById('ca').scrollTop = 0;
       if (id === 's') setTimeout(initCaps, 80);
+      if (id === 'c') setTimeout(initCrowdMap, 120);
       if (id === 'a') { var b = document.getElementById('badge'); if (b) b.style.display = 'none'; }
     }
 
@@ -2356,10 +2511,12 @@
 
       navigator.geolocation.getCurrentPosition(
         function (p) {
-          document.getElementById('loc').value = p.coords.latitude.toFixed(5) + ', ' + p.coords.longitude.toFixed(5);
+          var lat = p.coords.latitude, lng = p.coords.longitude;
+          document.getElementById('loc').value = lat.toFixed(5) + ', ' + lng.toFixed(5);
           btn.innerHTML = '<i class="ti ti-circle-check" style="font-size:16px"></i> ดึงพิกัด GPS สำเร็จ';
           btn.style.color = '#34D399'; btn.style.borderColor = 'rgba(5,150,105,.35)';
           btn.disabled = false;
+          showMiniMap('helpMap', [lat, lng]);
           toast('📍 ดึงพิกัด GPS สำเร็จ', 2500, '#059669');
         },
         function (err) {
@@ -2414,6 +2571,80 @@
       window._tt = setTimeout(function () { t.classList.remove('show'); }, dur || 3000);
     }
 
+    /* ══════════════════════════════════════
+       MAP (Leaflet + dark tiles)
+    ══════════════════════════════════════ */
+    var KK = [16.4419, 102.8360];           // ศูนย์กลาง: อ.เมืองขอนแก่น
+    var crowdMapObj = null, miniMaps = {}, pinLatLng = null;
+
+    // จุดรายงานตัวอย่าง (ให้ตรงกับการ์ดใน feed)
+    var REPORTS = [
+      { type: 'road', ll: [16.4360, 102.8240], where: 'ถนนเลี่ยงเมือง ขก. หน้าตลาดบางลำพู' },
+      { type: 'bridge', ll: [16.4550, 102.8600], where: 'สะพานข้ามคลองบ้านโคก ต.พระลับ' },
+      { type: 'deep', ll: [16.4180, 102.7960], where: 'ซอยบ้านทุ่ม 12 ใกล้โรงเรียน' },
+      { type: 'block', ll: [16.4330, 102.8470], where: 'ถนนกลางเมือง ช่วงหน้าวัดธาตุ' }
+    ];
+
+    function tiles() {
+      return L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd', maxZoom: 19,
+        attribution: '© OpenStreetMap, © CARTO'
+      });
+    }
+
+    function pinIcon(type) {
+      var m = hazMeta[type] || { emoji: '📍' };
+      return L.divIcon({
+        className: '',
+        html: '<div class="pin pin-' + type + '"><span>' + m.emoji + '</span></div>',
+        iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30]
+      });
+    }
+
+    function meIcon() {
+      return L.divIcon({ className: '', html: '<div class="pin-me-pulse"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
+    }
+
+    function mapUnavailable(id) {
+      document.getElementById(id).innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:center;height:100%;text-align:center;padding:16px;color:var(--t1);font-size:12px">'
+        + '<div><i class="ti ti-wifi-off" style="font-size:24px;display:block;margin-bottom:6px;color:var(--t2)"></i>'
+        + 'ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อแสดงแผนที่</div></div>';
+    }
+
+    function initCrowdMap() {
+      if (typeof L === 'undefined') { mapUnavailable('crowdMap'); return; }
+      if (!crowdMapObj) {
+        crowdMapObj = L.map('crowdMap', { zoomControl: true, attributionControl: true }).setView(KK, 13);
+        tiles().addTo(crowdMapObj);
+        REPORTS.forEach(function (r) { addCrowdMarker(r.type, r.ll, r.where); });
+      }
+      setTimeout(function () { crowdMapObj.invalidateSize(); }, 60);
+    }
+
+    function addCrowdMarker(type, ll, where) {
+      if (!crowdMapObj) return;
+      var m = hazMeta[type] || { tag: 'รายงาน' };
+      L.marker(ll, { icon: pinIcon(type) }).addTo(crowdMapObj)
+        .bindPopup('<span class="pp-tag">' + (m.tag || '') + '</span><br><b>' + where + '</b>');
+    }
+
+    // แผนที่ย่อ (ใช้ในหน้าขอความช่วยเหลือ + แผ่นรายงาน)
+    function showMiniMap(id, ll) {
+      var box = document.getElementById(id);
+      box.style.display = 'block';
+      if (typeof L === 'undefined') { mapUnavailable(id); return; }
+      if (!miniMaps[id]) {
+        miniMaps[id] = L.map(id, { zoomControl: false, attributionControl: false, dragging: true }).setView(ll, 15);
+        tiles().addTo(miniMaps[id]);
+        miniMaps[id]._pin = L.marker(ll, { icon: meIcon() }).addTo(miniMaps[id]);
+      } else {
+        miniMaps[id].setView(ll, 15);
+        miniMaps[id]._pin.setLatLng(ll);
+      }
+      setTimeout(function () { miniMaps[id].invalidateSize(); }, 80);
+    }
+
     /* ── CROWDSOURCING REPORT ── */
     var hazType = null, hazMeta = {
       road: { tag: 'ถนนรถเล็กผ่านไม่ได้', cls: 'rt-road', thumb: 'th-road', emoji: '🚗' },
@@ -2465,20 +2696,26 @@
         navigator.geolocation.getCurrentPosition(
           function (p) {
             pinned = true;
+            pinLatLng = [p.coords.latitude, p.coords.longitude];
             main.textContent = '📍 ปักหมุดแล้ว';
             sub.textContent = p.coords.latitude.toFixed(5) + ', ' + p.coords.longitude.toFixed(5);
+            showMiniMap('sheetMap', pinLatLng);
           },
           function () {
             pinned = true;
+            pinLatLng = [KK[0] + (Math.random() - .5) * .02, KK[1] + (Math.random() - .5) * .02];
             main.textContent = '📍 ปักหมุดแล้ว (ตำแหน่งโดยประมาณ)';
             sub.textContent = 'อ.เมือง จ.ขอนแก่น';
+            showMiniMap('sheetMap', pinLatLng);
           },
           { enableHighAccuracy: true, timeout: 12000 }
         );
       } else {
         pinned = true;
+        pinLatLng = [KK[0] + (Math.random() - .5) * .02, KK[1] + (Math.random() - .5) * .02];
         main.textContent = '📍 ปักหมุดแล้ว (ตัวอย่าง)';
-        sub.textContent = 'อ.เมือง จ.ขอนแก่น';
+        sub.textContent = 'อ.เมือง จ.ขอนแก่น (พิกัดตัวอย่าง)';
+        showMiniMap('sheetMap', pinLatLng);
       }
     }
 
@@ -2510,14 +2747,22 @@
       var feed = document.getElementById('repFeed');
       feed.insertAdjacentHTML('afterbegin', html);
 
+      // ปักหมุดลงแผนที่ตามพิกัดที่ได้รับ
+      var ll = pinLatLng || [KK[0] + (Math.random() - .5) * .02, KK[1] + (Math.random() - .5) * .02];
+      if (crowdMapObj) {
+        addCrowdMarker(hazType, ll, locTxt);
+        crowdMapObj.flyTo(ll, 15, { duration: 1 });
+      }
+
       // reset
       closeSheet();
-      hazType = null; photoData = null; pinned = false;
+      hazType = null; photoData = null; pinned = false; pinLatLng = null;
       document.querySelectorAll('.haz').forEach(function (h) { h.classList.remove('sel'); });
       document.getElementById('repNote').value = '';
       retakePhoto({ stopPropagation: function () { } });
       document.getElementById('pinLoc').textContent = 'ปักหมุดตำแหน่งปัจจุบัน';
       document.getElementById('pinSub').textContent = 'แตะเพื่อดึงพิกัด GPS';
+      document.getElementById('sheetMap').style.display = 'none';
 
       if (navigator.vibrate) navigator.vibrate(80);
       toast('✅ ส่งรายงานแล้ว! เพื่อนบ้านจะเห็นการเตือนนี้', 4000, '#059669');
