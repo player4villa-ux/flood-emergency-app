@@ -796,6 +796,401 @@
       letter-spacing: .3px
     }
 
+    /* ══════════════════════════════════════
+       MODE SWITCH + RESCUER DASHBOARD
+    ══════════════════════════════════════ */
+    .mode-switch {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      background: var(--bg0);
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--b0)
+    }
+
+    .ms-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--b0);
+      border-radius: 10px;
+      padding: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t1);
+      cursor: pointer;
+      transition: all .18s
+    }
+
+    .ms-btn .ti {
+      font-size: 17px
+    }
+
+    .ms-btn.on {
+      background: rgba(14, 165, 233, .12);
+      border-color: var(--blue);
+      color: var(--blue)
+    }
+
+    #ms-rescuer.on {
+      background: rgba(232, 56, 12, .12);
+      border-color: var(--red);
+      color: #F87A60
+    }
+
+    .bnav.cols4 {
+      grid-template-columns: repeat(4, 1fr)
+    }
+
+    /* KPI cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 4px
+    }
+
+    .kpi {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 16px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .kpi::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px
+    }
+
+    .kpi-red::before {
+      background: var(--red)
+    }
+
+    .kpi-amber::before {
+      background: var(--amber)
+    }
+
+    .kpi-blue::before {
+      background: var(--blue)
+    }
+
+    .kpi-green::before {
+      background: var(--green)
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px
+    }
+
+    .kpi-top .ti {
+      font-size: 22px;
+      color: var(--t1)
+    }
+
+    .kpi-red .kpi-top .ti {
+      color: #F87A60
+    }
+
+    .kpi-amber .kpi-top .ti {
+      color: #FBBF24
+    }
+
+    .kpi-blue .kpi-top .ti {
+      color: #38BDF8
+    }
+
+    .kpi-green .kpi-top .ti {
+      color: #34D399
+    }
+
+    .kpi-trend {
+      font-size: 11px;
+      font-weight: 700;
+      color: #F87A60
+    }
+
+    .kpi-val {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--t0);
+      line-height: 1
+    }
+
+    .kpi-sub {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--t2)
+    }
+
+    .kpi-lbl {
+      font-size: 11.5px;
+      color: var(--t1);
+      margin-top: 3px
+    }
+
+    /* SOS case row */
+    .case {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 9px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s
+    }
+
+    .case:active {
+      border-color: var(--b1);
+      background: var(--bg4)
+    }
+
+    .case.sel {
+      border-color: var(--blue);
+      background: rgba(14, 165, 233, .07)
+    }
+
+    .case-pri {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .case-pri.p1 {
+      background: var(--red)
+    }
+
+    .case-pri.p2 {
+      background: var(--amber);
+      color: #1A1206
+    }
+
+    .case-pri.p3 {
+      background: var(--blue)
+    }
+
+    .case-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .case-where {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t0);
+      margin-bottom: 2px
+    }
+
+    .case-meta {
+      font-size: 11px;
+      color: var(--t1);
+      line-height: 1.4
+    }
+
+    .case-arrow {
+      font-size: 18px;
+      color: var(--t2);
+      flex-shrink: 0
+    }
+
+    .case .case-go {
+      background: var(--blue);
+      border: none;
+      border-radius: 9px;
+      padding: 8px 12px;
+      color: #fff;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .case .case-go .ti {
+      font-size: 14px
+    }
+
+    /* route info */
+    .route-info {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px
+    }
+
+    .ri-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px
+    }
+
+    .ri-item .ti {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .ri-main {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--t0)
+    }
+
+    .ri-sub {
+      font-size: 11.5px;
+      color: var(--t1);
+      margin-top: 2px;
+      line-height: 1.45
+    }
+
+    /* hotspot row */
+    .hot {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 9px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      cursor: pointer
+    }
+
+    .hot:active {
+      border-color: var(--b1)
+    }
+
+    .hot-rank {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--t1);
+      flex-shrink: 0
+    }
+
+    .hot-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .hot-where {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t0)
+    }
+
+    .hot-bar {
+      height: 5px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 3px;
+      margin-top: 5px;
+      overflow: hidden
+    }
+
+    .hot-fill {
+      height: 100%;
+      border-radius: 3px;
+      width: 0;
+      transition: width 1s ease
+    }
+
+    .hot-count {
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .hot-num {
+      font-size: 19px;
+      font-weight: 800
+    }
+
+    .hot-unit {
+      font-size: 9px;
+      color: var(--t2)
+    }
+
+    /* resource row */
+    .res {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 9px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .res-ico {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .res-ico .ti {
+      font-size: 21px
+    }
+
+    .res-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .res-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 7px
+    }
+
+    .res-top span {
+      font-size: 13px;
+      color: var(--t0);
+      font-weight: 600
+    }
+
+    .res-top b {
+      font-size: 12.5px;
+      color: var(--t1);
+      font-weight: 700
+    }
+
     /* ── MAP (Leaflet) ── */
     .map-box {
       width: 100%;
@@ -1894,6 +2289,16 @@
       </div>
     </header>
 
+    <!-- MODE SWITCH -->
+    <div class="mode-switch" role="tablist" aria-label="เลือกมุมมองการใช้งาน">
+      <button id="ms-citizen" class="ms-btn on" role="tab" onclick="setMode('citizen')">
+        <i class="ti ti-user"></i> ประชาชน
+      </button>
+      <button id="ms-rescuer" class="ms-btn" role="tab" onclick="setMode('rescuer')">
+        <i class="ti ti-helicopter-landing"></i> หน่วยกู้ภัย
+      </button>
+    </div>
+
     <!-- TICKER -->
     <div class="ticker" role="marquee" aria-label="ข่าวด่วน">
       <div class="ticker-inner">
@@ -1968,18 +2373,18 @@
               <div class="cc-name">กู้ชีพฉุกเฉิน</div>
             </div>
           </a>
-          <a href="tel:1784" class="cc" aria-label="โทร 1784 ชลประทาน">
-            <div class="cc-ico ico-b"><i class="ti ti-droplet-filled"></i></div>
+          <a href="tel:1784" class="cc" aria-label="โทร 1784 กรมป้องกันและบรรเทาสาธารณภัย">
+            <div class="cc-ico ico-g"><i class="ti ti-urgent"></i></div>
             <div>
               <div class="cc-num">1784</div>
-              <div class="cc-name">ชลประทาน</div>
+              <div class="cc-name">ปภ. (ป้องกันภัย)</div>
             </div>
           </a>
-          <a href="tel:1111" class="cc" aria-label="โทร 1111 สายด่วนรัฐบาล">
-            <div class="cc-ico ico-g"><i class="ti ti-building"></i></div>
+          <a href="tel:1460" class="cc" aria-label="โทร 1460 กรมชลประทาน">
+            <div class="cc-ico ico-b"><i class="ti ti-droplet-filled"></i></div>
             <div>
-              <div class="cc-num">1111</div>
-              <div class="cc-name">สายด่วนรัฐบาล</div>
+              <div class="cc-num">1460</div>
+              <div class="cc-name">ชลประทาน</div>
             </div>
           </a>
         </div>
@@ -2320,10 +2725,188 @@
         </div>
       </div>
 
+      <!-- ════════════════════════════════════
+           RESCUER DASHBOARD PAGES
+      ════════════════════════════════════ -->
+
+      <!-- ── ภาพรวม (Overview) ── -->
+      <div id="pg-rov" class="page">
+        <div class="form-wrap">
+          <div class="pg-head">
+            <h2>🚁 ศูนย์บัญชาการกู้ภัย</h2>
+            <p>ภาพรวมสถานการณ์ — กรุงเทพมหานคร · อัปเดตสด</p>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi kpi-red">
+              <div class="kpi-top"><i class="ti ti-sos"></i><span class="kpi-trend">▲ 12</span></div>
+              <div class="kpi-val">47</div>
+              <div class="kpi-lbl">SOS รอช่วยเหลือ</div>
+            </div>
+            <div class="kpi kpi-amber">
+              <div class="kpi-top"><i class="ti ti-flame"></i></div>
+              <div class="kpi-val">6</div>
+              <div class="kpi-lbl">จุดวิกฤตหนาแน่น</div>
+            </div>
+            <div class="kpi kpi-blue">
+              <div class="kpi-top"><i class="ti ti-sailboat"></i></div>
+              <div class="kpi-val">8<span class="kpi-sub">/15</span></div>
+              <div class="kpi-lbl">เรือกู้ภัยว่าง</div>
+            </div>
+            <div class="kpi kpi-green">
+              <div class="kpi-top"><i class="ti ti-bed"></i></div>
+              <div class="kpi-val">890<span class="kpi-sub">/1650</span></div>
+              <div class="kpi-lbl">เตียงศูนย์อพยพว่าง</div>
+            </div>
+          </div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:18px 0 10px">SOS ล่าสุด — เรียงตามความเร่งด่วน</div>
+
+          <div class="case mini" onclick="nav('rmis',document.getElementById('nb-rmis'))">
+            <div class="case-pri p1">P1</div>
+            <div class="case-body">
+              <div class="case-where">ซอยลาดพร้าว 101 เขตบางกะปิ</div>
+              <div class="case-meta">👥 6 คน · มีผู้สูงอายุ · น้ำสูง 1.8 ม. · 4 นาทีที่แล้ว</div>
+            </div>
+            <i class="ti ti-chevron-right case-arrow"></i>
+          </div>
+          <div class="case mini" onclick="nav('rmis',document.getElementById('nb-rmis'))">
+            <div class="case-pri p1">P1</div>
+            <div class="case-body">
+              <div class="case-where">ชุมชนริมคลองแสนแสบ เขตวังทองหลาง</div>
+              <div class="case-meta">👥 9 คน · มีเด็กเล็ก 2 · ติดบนหลังคา · 7 นาทีที่แล้ว</div>
+            </div>
+            <i class="ti ti-chevron-right case-arrow"></i>
+          </div>
+          <div class="case mini" onclick="nav('rmis',document.getElementById('nb-rmis'))">
+            <div class="case-pri p2">P2</div>
+            <div class="case-body">
+              <div class="case-where">ถนนสุขุมวิท ซอย 39 เขตวัฒนา</div>
+              <div class="case-meta">👥 3 คน · ต้องการเรือ · น้ำสูง 1.2 ม. · 15 นาทีที่แล้ว</div>
+            </div>
+            <i class="ti ti-chevron-right case-arrow"></i>
+          </div>
+
+          <button class="sub-btn" style="background:var(--blue);box-shadow:0 6px 28px rgba(14,165,233,.28);margin-top:6px"
+            onclick="nav('rmap', document.getElementById('nb-rmap'))">
+            <i class="ti ti-map-2"></i> เปิดแผนที่วิกฤต (Heatmap)
+          </button>
+        </div>
+      </div>
+
+      <!-- ── แผนที่วิกฤต (Heatmap) ── -->
+      <div id="pg-rmap" class="page">
+        <div class="form-wrap">
+          <div class="pg-head">
+            <h2>🔥 แผนที่วิกฤต (Heatmap)</h2>
+            <p>จุดสีแดง = บริเวณที่มีการกด SOS หนาแน่น</p>
+          </div>
+
+          <div class="map-box" id="crisisMap" style="height:260px"></div>
+          <div class="map-legend">
+            <div class="lg"><span class="lg-dot" style="background:rgba(232,56,12,.9)"></span> วิกฤตสูง (SOS &gt; 10)</div>
+            <div class="lg"><span class="lg-dot" style="background:rgba(245,158,11,.9)"></span> ปานกลาง (5–10)</div>
+            <div class="lg"><span class="lg-dot" style="background:rgba(14,165,233,.9)"></span> เฝ้าระวัง (&lt; 5)</div>
+          </div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:6px 0 10px">จุดเร่งด่วน — เรียงตามจำนวน SOS</div>
+          <div id="hotspotList"></div>
+        </div>
+      </div>
+
+      <!-- ── ภารกิจ + นำทาง (Missions / Routing) ── -->
+      <div id="pg-rmis" class="page">
+        <div class="form-wrap">
+          <div class="pg-head">
+            <h2>🧭 ภารกิจ &amp; นำทาง</h2>
+            <p>เส้นทางนำทางหลบโซนน้ำท่วมลึก ไปหาผู้ประสบภัย</p>
+          </div>
+
+          <div class="map-box" id="routeMap" style="height:240px"></div>
+          <div class="route-info" id="routeInfo">
+            <div class="ri-item"><i class="ti ti-route" style="color:#34D399"></i>
+              <div><div class="ri-main" id="riDist">เส้นทางปลอดภัย 4.2 กม.</div>
+                <div class="ri-sub" id="riNote">หลบโซนน้ำท่วมลึกบนถนนเพชรบุรี · ถึงใน ~11 นาที</div></div>
+            </div>
+          </div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:4px 0 10px">รายการภารกิจ — แตะเพื่อนำทาง</div>
+          <div id="missionList"></div>
+        </div>
+      </div>
+
+      <!-- ── ทรัพยากร (Resource Management) ── -->
+      <div id="pg-rres" class="page">
+        <div class="form-wrap">
+          <div class="pg-head">
+            <h2>📦 จัดการทรัพยากร</h2>
+            <p>สถานะกำลังพล อุปกรณ์ และคลังเสบียง</p>
+          </div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:2px 0 10px">ยานพาหนะ &amp; กำลังกู้ภัย</div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(14,165,233,.12);color:#38BDF8"><i class="ti ti-sailboat"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>เรือกู้ภัย</span><b>8 / 15 ว่าง</b></div>
+              <div class="capbar"><div class="capfill cap-a res-bar" data-w="53"></div></div>
+            </div>
+          </div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(245,158,11,.12);color:#FBBF24"><i class="ti ti-truck"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>รถยกสูง / รถบรรทุก</span><b>3 / 6 ว่าง</b></div>
+              <div class="capbar"><div class="capfill cap-a res-bar" data-w="50"></div></div>
+            </div>
+          </div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(232,56,12,.12);color:#F87A60"><i class="ti ti-users-group"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>ทีมกู้ภัยภาคสนาม</span><b>12 / 20 ทีม</b></div>
+              <div class="capbar"><div class="capfill cap-r res-bar" data-w="60"></div></div>
+            </div>
+          </div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:18px 0 10px">ศูนย์อพยพ &amp; เตียง</div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(5,150,105,.12);color:#34D399"><i class="ti ti-bed"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>เตียงว่างรวม</span><b>890 / 1,650</b></div>
+              <div class="capbar"><div class="capfill cap-g res-bar" data-w="54"></div></div>
+            </div>
+          </div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:18px 0 10px">คลังเสบียง</div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(14,165,233,.12);color:#38BDF8"><i class="ti ti-bottle"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>น้ำดื่ม (ขวด)</span><b>12,400</b></div>
+              <div class="capbar"><div class="capfill cap-g res-bar" data-w="72"></div></div>
+            </div>
+          </div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(245,158,11,.12);color:#FBBF24"><i class="ti ti-meat"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>อาหารกล่อง / ถุงยังชีพ</span><b>5,800</b></div>
+              <div class="capbar"><div class="capfill cap-a res-bar" data-w="38"></div></div>
+            </div>
+          </div>
+          <div class="res">
+            <div class="res-ico" style="background:rgba(232,56,12,.12);color:#F87A60"><i class="ti ti-first-aid-kit"></i></div>
+            <div class="res-body">
+              <div class="res-top"><span>ชุดเวชภัณฑ์ / ยา</span><b>1,250 ชุด</b></div>
+              <div class="capbar"><div class="capfill cap-r res-bar" data-w="22"></div></div>
+            </div>
+          </div>
+          <div style="background:rgba(232,56,12,.07);border:1px solid rgba(232,56,12,.25);border-radius:12px;padding:12px;margin-top:6px;font-size:12px;color:#F8C4B4;line-height:1.5">
+            <i class="ti ti-alert-triangle" style="color:#F87A60"></i> เวชภัณฑ์ใกล้หมด (22%) — แนะนำประสานเบิกเพิ่มจากคลังกลาง
+          </div>
+        </div>
+      </div>
+
     </main><!-- /content -->
 
-    <!-- ═══ BOTTOM NAV ═══ -->
-    <nav class="bnav" aria-label="เมนูหลัก">
+    <!-- ═══ BOTTOM NAV — ประชาชน ═══ -->
+    <nav class="bnav" id="bnavCitizen" aria-label="เมนูประชาชน">
       <button id="nb-e" class="nbtn on" onclick="nav('e',this)" aria-label="หน้าฉุกเฉิน">
         <i class="ti ti-sos"></i>
         <span class="nlbl">ฉุกเฉิน</span>
@@ -2344,6 +2927,26 @@
       <button id="nb-s" class="nbtn" onclick="nav('s',this)" aria-label="หน้าที่พักพิง">
         <i class="ti ti-home"></i>
         <span class="nlbl">ที่พักพิง</span>
+      </button>
+    </nav>
+
+    <!-- ═══ BOTTOM NAV — กู้ภัย ═══ -->
+    <nav class="bnav cols4" id="bnavRescuer" style="display:none" aria-label="เมนูหน่วยกู้ภัย">
+      <button id="nb-rov" class="nbtn on" onclick="nav('rov',this)" aria-label="ภาพรวม">
+        <i class="ti ti-layout-dashboard"></i>
+        <span class="nlbl">ภาพรวม</span>
+      </button>
+      <button id="nb-rmap" class="nbtn" onclick="nav('rmap',this)" aria-label="แผนที่วิกฤต">
+        <i class="ti ti-flame"></i>
+        <span class="nlbl">แผนที่วิกฤต</span>
+      </button>
+      <button id="nb-rmis" class="nbtn" onclick="nav('rmis',this)" aria-label="ภารกิจและนำทาง">
+        <i class="ti ti-route"></i>
+        <span class="nlbl">ภารกิจ</span>
+      </button>
+      <button id="nb-rres" class="nbtn" onclick="nav('rres',this)" aria-label="ทรัพยากร">
+        <i class="ti ti-package"></i>
+        <span class="nlbl">ทรัพยากร</span>
       </button>
     </nav>
 
@@ -2422,19 +3025,51 @@
 
   <script>
     /* ── NAV ── */
-    var PAGES = ['e', 'r', 'c', 'a', 's'], ppl = 2;
+    var CITIZEN_PAGES = ['e', 'r', 'c', 'a', 's'];
+    var RESCUER_PAGES = ['rov', 'rmap', 'rmis', 'rres'];
+    var ALL_PAGES = CITIZEN_PAGES.concat(RESCUER_PAGES);
+    var mode = 'citizen', ppl = 2;
 
     function nav(id, btn) {
-      PAGES.forEach(function (p) {
+      ALL_PAGES.forEach(function (p) {
         document.getElementById('pg-' + p).classList.remove('active');
-        document.getElementById('nb-' + p).classList.remove('on');
+        var nb = document.getElementById('nb-' + p);
+        if (nb) nb.classList.remove('on');
       });
       document.getElementById('pg-' + id).classList.add('active');
-      btn.classList.add('on');
+      if (btn) btn.classList.add('on');
       document.getElementById('ca').scrollTop = 0;
+
+      // citizen hooks
       if (id === 's') setTimeout(initCaps, 80);
       if (id === 'c') setTimeout(initCrowdMap, 120);
       if (id === 'a') { var b = document.getElementById('badge'); if (b) b.style.display = 'none'; }
+
+      // rescuer hooks
+      if (id === 'rmap') setTimeout(initCrisisMap, 120);
+      if (id === 'rmis') setTimeout(initRouteMap, 120);
+      if (id === 'rres') setTimeout(animateResBars, 80);
+    }
+
+    function setMode(m) {
+      mode = m;
+      var isR = (m === 'rescuer');
+      document.getElementById('ms-citizen').classList.toggle('on', !isR);
+      document.getElementById('ms-rescuer').classList.toggle('on', isR);
+      document.getElementById('bnavCitizen').style.display = isR ? 'none' : 'grid';
+      document.getElementById('bnavRescuer').style.display = isR ? 'grid' : 'none';
+      // header label
+      var sub = document.querySelector('.logo-sub');
+      if (sub) sub.textContent = isR ? 'โหมดศูนย์บัญชาการกู้ภัย' : 'ระบบแจ้งเหตุฉุกเฉิน';
+      // go to default page of the mode
+      if (isR) nav('rov', document.getElementById('nb-rov'));
+      else nav('e', document.getElementById('nb-e'));
+    }
+
+    function animateResBars() {
+      document.querySelectorAll('#pg-rres .res-bar[data-w]').forEach(function (b) {
+        b.style.width = b.getAttribute('data-w') + '%';
+      });
     }
 
     /* ── WATER LEVEL INIT ── */
@@ -2650,6 +3285,136 @@
         miniMaps[id]._pin.setLatLng(ll);
       }
       setTimeout(function () { miniMaps[id].invalidateSize(); }, 80);
+    }
+
+    /* ══════════════════════════════════════
+       RESCUER — Crisis Heatmap + Hotspots
+    ══════════════════════════════════════ */
+    var HOTSPOTS = [
+      { where: 'ชุมชนริมคลองแสนแสบ เขตวังทองหลาง', ll: [13.7656, 100.6100], sos: 14 },
+      { where: 'ซอยลาดพร้าว 101 เขตบางกะปิ', ll: [13.7780, 100.6430], sos: 11 },
+      { where: 'ถนนสุขุมวิท ซอย 39 เขตวัฒนา', ll: [13.7308, 100.5690], sos: 8 },
+      { where: 'เขตลาดกระบัง (ใกล้สนามบิน)', ll: [13.7220, 100.7500], sos: 6 },
+      { where: 'ชุมชนเยาวราช เขตสัมพันธวงศ์', ll: [13.7400, 100.5100], sos: 4 }
+    ];
+    var crisisMapObj = null;
+
+    function heatColor(n) { return n > 10 ? '#E8380C' : n >= 5 ? '#F59E0B' : '#0EA5E9'; }
+
+    function initCrisisMap() {
+      var listEl = document.getElementById('hotspotList');
+      if (typeof L === 'undefined') { mapUnavailable('crisisMap'); }
+      else if (!crisisMapObj) {
+        crisisMapObj = L.map('crisisMap', { zoomControl: true, attributionControl: true }).setView(BKK, 12);
+        tiles().addTo(crisisMapObj);
+        HOTSPOTS.forEach(function (h) {
+          var c = heatColor(h.sos);
+          // วงความร้อน (heat blob) — ใหญ่ตามจำนวน SOS
+          L.circle(h.ll, { radius: 300 + h.sos * 90, color: c, weight: 0, fillColor: c, fillOpacity: .28 }).addTo(crisisMapObj);
+          L.circle(h.ll, { radius: 120 + h.sos * 35, color: c, weight: 0, fillColor: c, fillOpacity: .35 }).addTo(crisisMapObj);
+          L.marker(h.ll, {
+            icon: L.divIcon({ className: '', html: '<div class="pin" style="background:' + c + '"><span>' + h.sos + '</span></div>', iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] })
+          }).addTo(crisisMapObj).bindPopup('<span class="pp-tag">SOS ' + h.sos + ' ราย</span><br><b>' + h.where + '</b>');
+        });
+      }
+      if (crisisMapObj) setTimeout(function () { crisisMapObj.invalidateSize(); }, 60);
+
+      // ranked hotspot list
+      if (listEl && !listEl.dataset.built) {
+        var max = HOTSPOTS[0].sos;
+        listEl.innerHTML = HOTSPOTS.map(function (h, i) {
+          var c = heatColor(h.sos);
+          return '<div class="hot" onclick="flyCrisis(' + i + ')">' +
+            '<div class="hot-rank">' + (i + 1) + '</div>' +
+            '<div class="hot-body"><div class="hot-where">' + h.where + '</div>' +
+            '<div class="hot-bar"><div class="hot-fill" style="background:' + c + ';width:' + Math.round(h.sos / max * 100) + '%"></div></div></div>' +
+            '<div class="hot-count"><div class="hot-num" style="color:' + c + '">' + h.sos + '</div><div class="hot-unit">SOS</div></div>' +
+            '</div>';
+        }).join('');
+        listEl.dataset.built = '1';
+      }
+    }
+
+    function flyCrisis(i) {
+      var h = HOTSPOTS[i];
+      if (crisisMapObj) crisisMapObj.flyTo(h.ll, 14, { duration: 1 });
+      toast('🎯 โฟกัสจุด: ' + h.where, 2500, '#E8380C');
+    }
+
+    /* ══════════════════════════════════════
+       RESCUER — Routing to Victims (avoid deep flood)
+    ══════════════════════════════════════ */
+    var BASE = [13.7460, 100.5380]; // ฐานกู้ภัย (สมมติ)
+    var MISSIONS = [
+      { pri: 'p1', where: 'ชุมชนริมคลองแสนแสบ เขตวังทองหลาง', ll: [13.7656, 100.6100], meta: '👥 9 คน · เด็กเล็ก 2 · ติดบนหลังคา', dist: '5.6 กม.', eta: '14 นาที', avoid: 'หลบจุดน้ำลึกบนถนนเพชรบุรีตัดใหม่' },
+      { pri: 'p1', where: 'ซอยลาดพร้าว 101 เขตบางกะปิ', ll: [13.7780, 100.6430], meta: '👥 6 คน · มีผู้สูงอายุ · น้ำสูง 1.8 ม.', dist: '7.2 กม.', eta: '18 นาที', avoid: 'หลบถนนลาดพร้าวช่วงน้ำท่วมลึก ใช้เส้นรามคำแหง' },
+      { pri: 'p2', where: 'ถนนสุขุมวิท ซอย 39 เขตวัฒนา', ll: [13.7308, 100.5690], meta: '👥 3 คน · ต้องการเรือ · น้ำสูง 1.2 ม.', dist: '4.2 กม.', eta: '11 นาที', avoid: 'หลบจุดน้ำลึกบนถนนเพชรบุรี ใช้ทางด่วนเฉลิมมหานคร' },
+      { pri: 'p3', where: 'ชุมชนเยาวราช เขตสัมพันธวงศ์', ll: [13.7400, 100.5100], meta: '👥 2 คน · เสบียงหมด · รอรับของ', dist: '3.1 กม.', eta: '9 นาที', avoid: 'เส้นทางปกติผ่านได้ ระวังจราจรหนาแน่น' }
+    ];
+    var routeMapObj = null, routeLine = null, victimMarker = null, floodZone = null, baseMarker = null;
+
+    // สร้างเส้นทาง "อ้อม" โซนน้ำท่วม (จุดกึ่งกลางเบนออกจากเส้นตรง)
+    function buildRoute(a, b) {
+      var midLat = (a[0] + b[0]) / 2, midLng = (a[1] + b[1]) / 2;
+      var bend = [midLat + 0.012, midLng - 0.006]; // เบนหลบโซนน้ำท่วม
+      return [a, bend, b];
+    }
+
+    function initRouteMap() {
+      if (typeof L === 'undefined') { mapUnavailable('routeMap'); renderMissions(); return; }
+      if (!routeMapObj) {
+        routeMapObj = L.map('routeMap', { zoomControl: true, attributionControl: false }).setView(BKK, 12);
+        tiles().addTo(routeMapObj);
+        baseMarker = L.marker(BASE, {
+          icon: L.divIcon({ className: '', html: '<div class="pin pin-deep"><span>🚁</span></div>', iconSize: [34, 34], iconAnchor: [17, 34] })
+        }).addTo(routeMapObj).bindPopup('<b>ฐานปฏิบัติการกู้ภัย</b>');
+      }
+      renderMissions();
+      selectMission(0, true);
+      setTimeout(function () { routeMapObj.invalidateSize(); }, 60);
+    }
+
+    function renderMissions() {
+      var el = document.getElementById('missionList');
+      if (!el || el.dataset.built) return;
+      el.innerHTML = MISSIONS.map(function (m, i) {
+        return '<div class="case" id="mis-' + i + '" onclick="selectMission(' + i + ')">' +
+          '<div class="case-pri ' + m.pri + '">' + m.pri.toUpperCase() + '</div>' +
+          '<div class="case-body"><div class="case-where">' + m.where + '</div>' +
+          '<div class="case-meta">' + m.meta + ' · ' + m.dist + '</div></div>' +
+          '<button class="case-go" onclick="event.stopPropagation();selectMission(' + i + ',true)"><i class="ti ti-navigation"></i> นำทาง</button>' +
+          '</div>';
+      }).join('');
+      el.dataset.built = '1';
+    }
+
+    function selectMission(i, fly) {
+      var m = MISSIONS[i];
+      document.querySelectorAll('#missionList .case').forEach(function (c) { c.classList.remove('sel'); });
+      var row = document.getElementById('mis-' + i); if (row) row.classList.add('sel');
+
+      if (routeMapObj) {
+        var path = buildRoute(BASE, m.ll);
+        if (routeLine) routeMapObj.removeLayer(routeLine);
+        if (victimMarker) routeMapObj.removeLayer(victimMarker);
+        if (floodZone) routeMapObj.removeLayer(floodZone);
+
+        // โซนน้ำท่วมลึกที่ต้องหลบ (วางใกล้เส้นตรง base→victim)
+        var fz = [(BASE[0] + m.ll[0]) / 2 - 0.004, (BASE[1] + m.ll[1]) / 2 + 0.002];
+        floodZone = L.circle(fz, { radius: 700, color: '#0EA5E9', weight: 1, fillColor: '#0EA5E9', fillOpacity: .22 })
+          .addTo(routeMapObj).bindPopup('<span class="pp-tag">โซนน้ำท่วมลึก</span><br>หลีกเลี่ยงเส้นทางนี้');
+
+        routeLine = L.polyline(path, { color: '#34D399', weight: 5, opacity: .9, dashArray: '1,0' }).addTo(routeMapObj);
+        victimMarker = L.marker(m.ll, {
+          icon: L.divIcon({ className: '', html: '<div class="pin pin-road"><span>🆘</span></div>', iconSize: [34, 34], iconAnchor: [17, 34] })
+        }).addTo(routeMapObj).bindPopup('<span class="pp-tag">ผู้ประสบภัย</span><br><b>' + m.where + '</b>');
+
+        if (fly) routeMapObj.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+      }
+      var d = document.getElementById('riDist'), n = document.getElementById('riNote');
+      if (d) d.textContent = 'เส้นทางปลอดภัย ' + m.dist;
+      if (n) n.textContent = m.avoid + ' · ถึงใน ~' + m.eta;
+      if (fly) toast('🧭 เริ่มนำทางไป: ' + m.where, 2800, '#0EA5E9');
     }
 
     /* ── CROWDSOURCING REPORT ── */
