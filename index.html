@@ -769,6 +769,526 @@
     }
 
     /* ══════════════════════════════════════
+   CROWDSOURCING REPORT (Waze-style)
+══════════════════════════════════════ */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 14px;
+      padding: 0 2px
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--b0)
+    }
+
+    .section-divider span {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: .3px
+    }
+
+    /* Big "report hazard" launcher button */
+    .crowd-cta {
+      width: 100%;
+      background: linear-gradient(135deg, #0F2040, #14305A);
+      border: 1px solid var(--b1);
+      border-radius: 18px;
+      padding: 16px;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      transition: transform .1s, border-color .15s;
+      margin-bottom: 14px
+    }
+
+    .crowd-cta:active {
+      transform: scale(.98);
+      border-color: var(--blue)
+    }
+
+    .crowd-cta-ico {
+      width: 48px;
+      height: 48px;
+      background: rgba(245, 158, 11, .15);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .crowd-cta-ico .ti {
+      font-size: 26px;
+      color: #FBBF24
+    }
+
+    .crowd-cta-txt h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--t0);
+      margin-bottom: 2px
+    }
+
+    .crowd-cta-txt p {
+      font-size: 11.5px;
+      color: var(--t1);
+      line-height: 1.4
+    }
+
+    .crowd-cta-arrow {
+      margin-left: auto;
+      flex-shrink: 0
+    }
+
+    .crowd-cta-arrow .ti {
+      font-size: 20px;
+      color: var(--t2)
+    }
+
+    /* Community feed */
+    .feed-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 0 2px
+    }
+
+    .feed-head .fh-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t0);
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .feed-head .fh-title .ti {
+      font-size: 16px;
+      color: var(--blue)
+    }
+
+    .feed-live {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: #34D399;
+      font-weight: 700
+    }
+
+    .feed-live-dot {
+      width: 6px;
+      height: 6px;
+      background: #34D399;
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite
+    }
+
+    .rep {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      animation: pgIn .3s ease
+    }
+
+    .rep-thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .rep-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .th-road {
+      background: rgba(232, 56, 12, .12)
+    }
+
+    .th-bridge {
+      background: rgba(245, 158, 11, .12)
+    }
+
+    .th-deep {
+      background: rgba(14, 165, 233, .12)
+    }
+
+    .th-block {
+      background: rgba(139, 92, 246, .14)
+    }
+
+    .rep-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .rep-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+      flex-wrap: wrap
+    }
+
+    .rep-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 5px
+    }
+
+    .rt-road {
+      background: rgba(232, 56, 12, .12);
+      border: 1px solid rgba(232, 56, 12, .3);
+      color: #F87A60
+    }
+
+    .rt-bridge {
+      background: rgba(245, 158, 11, .12);
+      border: 1px solid rgba(245, 158, 11, .3);
+      color: #FBBF24
+    }
+
+    .rt-deep {
+      background: rgba(14, 165, 233, .12);
+      border: 1px solid rgba(14, 165, 233, .3);
+      color: #38BDF8
+    }
+
+    .rt-block {
+      background: rgba(139, 92, 246, .14);
+      border: 1px solid rgba(139, 92, 246, .3);
+      color: #C4B5FD
+    }
+
+    .rep-time {
+      font-size: 10px;
+      color: var(--t2);
+      margin-left: auto
+    }
+
+    .rep-where {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t0);
+      margin-bottom: 2px;
+      line-height: 1.3
+    }
+
+    .rep-note {
+      font-size: 11.5px;
+      color: var(--t1);
+      line-height: 1.5;
+      margin-bottom: 7px
+    }
+
+    .rep-foot {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .rep-user {
+      font-size: 10.5px;
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .rep-confirm {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t1);
+      padding: 2px 4px;
+      transition: color .15s
+    }
+
+    .rep-confirm .ti {
+      font-size: 15px
+    }
+
+    .rep-confirm:active,
+    .rep-confirm.done {
+      color: #34D399
+    }
+
+    /* ── CROWD REPORT MODAL (bottom sheet) ── */
+    .sheet-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 10, 22, .7);
+      z-index: 420;
+      display: none;
+      opacity: 0;
+      transition: opacity .25s
+    }
+
+    .sheet-bg.show {
+      display: block;
+      opacity: 1
+    }
+
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 430;
+      background: var(--bg2);
+      border-radius: 24px 24px 0 0;
+      border-top: 1px solid var(--b1);
+      padding: 8px 18px max(env(safe-area-inset-bottom), 18px);
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(.32, .72, 0, 1);
+      max-height: 92%;
+      overflow-y: auto;
+      scrollbar-width: none
+    }
+
+    .sheet::-webkit-scrollbar {
+      display: none
+    }
+
+    .sheet.show {
+      transform: translateY(0)
+    }
+
+    .sheet-grip {
+      width: 40px;
+      height: 4px;
+      background: var(--t2);
+      border-radius: 4px;
+      margin: 8px auto 14px
+    }
+
+    .sheet h3 {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--t0);
+      margin-bottom: 3px
+    }
+
+    .sheet-sub {
+      font-size: 12px;
+      color: var(--t1);
+      margin-bottom: 16px
+    }
+
+    /* hazard type picker */
+    .haz-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px
+    }
+
+    .haz {
+      background: rgba(255, 255, 255, .04);
+      border: 1.5px solid var(--b0);
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all .15s
+    }
+
+    .haz-emoji {
+      font-size: 24px;
+      flex-shrink: 0
+    }
+
+    .haz-txt {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--t1);
+      line-height: 1.25;
+      text-align: left
+    }
+
+    .haz.sel {
+      border-color: var(--blue);
+      background: rgba(14, 165, 233, .1)
+    }
+
+    .haz.sel .haz-txt {
+      color: var(--t0)
+    }
+
+    /* photo capture */
+    .photo-box {
+      border: 1.5px dashed var(--b1);
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: border-color .15s, background .15s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .photo-box:active {
+      border-color: var(--blue);
+      background: rgba(14, 165, 233, .05)
+    }
+
+    .photo-box .ti {
+      font-size: 34px;
+      color: var(--blue);
+      margin-bottom: 6px;
+      display: block
+    }
+
+    .photo-box .pb-main {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t0);
+      margin-bottom: 2px
+    }
+
+    .photo-box .pb-sub {
+      font-size: 11px;
+      color: var(--t2)
+    }
+
+    .photo-preview {
+      display: none;
+      width: 100%;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      position: relative
+    }
+
+    .photo-preview.show {
+      display: block
+    }
+
+    .photo-preview img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: block
+    }
+
+    .photo-retake {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(5, 10, 22, .8);
+      border: none;
+      border-radius: 100px;
+      padding: 6px 12px;
+      color: white;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .photo-retake .ti {
+      font-size: 13px
+    }
+
+    .sheet-loc {
+      background: rgba(14, 165, 233, .07);
+      border: 1px solid rgba(14, 165, 233, .2);
+      border-radius: 12px;
+      padding: 11px 13px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px
+    }
+
+    .sheet-loc .ti {
+      font-size: 19px;
+      color: var(--blue);
+      flex-shrink: 0
+    }
+
+    .sheet-loc-txt {
+      flex: 1;
+      min-width: 0
+    }
+
+    .sheet-loc-txt .sl-main {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--t0)
+    }
+
+    .sheet-loc-txt .sl-sub {
+      font-size: 10.5px;
+      color: var(--t1)
+    }
+
+    .sheet-submit {
+      width: 100%;
+      background: var(--amber);
+      border: none;
+      border-radius: 16px;
+      padding: 15px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #1A1206;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 24px rgba(245, 158, 11, .25);
+      transition: transform .1s
+    }
+
+    .sheet-submit:active {
+      transform: scale(.98)
+    }
+
+    .sheet-submit .ti {
+      font-size: 19px
+    }
+
+    /* ══════════════════════════════════════
    PAGE 3 — ALERTS
 ══════════════════════════════════════ */
     .pg-pad {
@@ -1042,7 +1562,7 @@
       background: var(--bg0);
       border-top: 1px solid var(--b0);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       padding: 8px 0 max(env(safe-area-inset-bottom), 16px);
       flex-shrink: 0
     }
@@ -1052,7 +1572,7 @@
       flex-direction: column;
       align-items: center;
       gap: 3px;
-      padding: 4px 2px;
+      padding: 4px 1px;
       border: none;
       background: transparent;
       cursor: pointer;
@@ -1061,16 +1581,17 @@
     }
 
     .nbtn .ti {
-      font-size: 25px;
+      font-size: 23px;
       color: var(--t2);
       transition: color .2s
     }
 
     .nbtn .nlbl {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--t2);
       font-weight: 600;
-      transition: color .2s
+      transition: color .2s;
+      white-space: nowrap
     }
 
     .nbtn.on .ti,
@@ -1081,7 +1602,7 @@
     .nbadge {
       position: absolute;
       top: 2px;
-      right: calc(50% - 24px);
+      right: calc(50% - 20px);
       background: var(--red);
       color: white;
       font-size: 9px;
@@ -1331,7 +1852,7 @@
       <div id="pg-r" class="page">
         <div class="form-wrap">
           <div class="pg-head">
-            <h2>📍 แจ้งเหตุขอความช่วยเหลือ</h2>
+            <h2>🆘 ขอความช่วยเหลือ</h2>
             <p>กรอกข้อมูลให้เจ้าหน้าที่เข้าช่วยได้เร็วขึ้น</p>
           </div>
 
@@ -1380,6 +1901,98 @@
           <button class="sub-btn" id="subbtn" onclick="doSubmit()">
             <i class="ti ti-send"></i> ส่งคำขอความช่วยเหลือ
           </button>
+        </div>
+      </div>
+
+      <!-- ════ PAGE: แจ้งเหตุ (Crowdsourcing) ════ -->
+      <div id="pg-c" class="page">
+        <div class="form-wrap">
+          <div class="pg-head">
+            <h2>🗺️ แจ้งเหตุบนเส้นทาง</h2>
+            <p>ถ่ายรูป + ปักหมุด เตือนเพื่อนบ้านแบบเรียลไทม์</p>
+          </div>
+
+          <button class="crowd-cta" onclick="openSheet()">
+            <div class="crowd-cta-ico"><i class="ti ti-camera-plus"></i></div>
+            <div class="crowd-cta-txt">
+              <h4>รายงานเหตุการณ์ใหม่</h4>
+              <p>เช่น ถนนน้ำท่วม รถเล็กผ่านไม่ได้ สะพานขาด เส้นทางปิด</p>
+            </div>
+            <div class="crowd-cta-arrow"><i class="ti ti-chevron-right"></i></div>
+          </button>
+
+          <div class="feed-head">
+            <div class="fh-title"><i class="ti ti-users-group"></i> รายงานล่าสุดในพื้นที่</div>
+            <div class="feed-live"><span class="feed-live-dot"></span> สด</div>
+          </div>
+
+          <div id="repFeed">
+            <!-- reports injected here + static ones below -->
+            <div class="rep">
+              <div class="rep-thumb th-road">🚗</div>
+              <div class="rep-body">
+                <div class="rep-top">
+                  <span class="rep-tag rt-road">ถนนรถเล็กผ่านไม่ได้</span>
+                  <span class="rep-time">8 นาที</span>
+                </div>
+                <div class="rep-where">ถนนเลี่ยงเมือง ขก. หน้าตลาดบางลำพู</div>
+                <div class="rep-note">น้ำสูงประมาณ 50 ซม. รถเก๋งดับกลางถนน 2 คัน แนะนำเลี่ยงไปทางถนนมิตรภาพ</div>
+                <div class="rep-foot">
+                  <span class="rep-user"><i class="ti ti-user-circle"></i> สมชาย ก.</span>
+                  <button class="rep-confirm" onclick="confirmRep(this)"><i class="ti ti-thumb-up"></i> ยืนยัน <b>23</b></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="rep">
+              <div class="rep-thumb th-bridge">🌉</div>
+              <div class="rep-body">
+                <div class="rep-top">
+                  <span class="rep-tag rt-bridge">สะพานชำรุด</span>
+                  <span class="rep-time">25 นาที</span>
+                </div>
+                <div class="rep-where">สะพานข้ามคลองบ้านโคก ต.พระลับ</div>
+                <div class="rep-note">ราวสะพานหักและน้ำเซาะดินข้างสะพาน ห้ามรถบรรทุกผ่านเด็ดขาด</div>
+                <div class="rep-foot">
+                  <span class="rep-user"><i class="ti ti-user-circle"></i> อบต.พระลับ</span>
+                  <button class="rep-confirm" onclick="confirmRep(this)"><i class="ti ti-thumb-up"></i> ยืนยัน <b>41</b></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="rep">
+              <div class="rep-thumb th-deep">🌊</div>
+              <div class="rep-body">
+                <div class="rep-top">
+                  <span class="rep-tag rt-deep">น้ำท่วมสูง</span>
+                  <span class="rep-time">1 ชม.</span>
+                </div>
+                <div class="rep-where">ซอยบ้านทุ่ม 12 ใกล้โรงเรียน</div>
+                <div class="rep-note">น้ำท่วมระดับเอว เดินผ่านได้แต่ระวังท่อระบายน้ำเปิด</div>
+                <div class="rep-foot">
+                  <span class="rep-user"><i class="ti ti-user-circle"></i> มาลี ส.</span>
+                  <button class="rep-confirm" onclick="confirmRep(this)"><i class="ti ti-thumb-up"></i> ยืนยัน <b>17</b></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="rep">
+              <div class="rep-thumb th-block">🚧</div>
+              <div class="rep-body">
+                <div class="rep-top">
+                  <span class="rep-tag rt-block">เส้นทางปิด</span>
+                  <span class="rep-time">2 ชม.</span>
+                </div>
+                <div class="rep-where">ถนนกลางเมือง ช่วงหน้าวัดธาตุ</div>
+                <div class="rep-note">เจ้าหน้าที่ปิดเส้นทางชั่วคราวเพื่อกู้ภัย ใช้เส้นทางเลี่ยงตามป้าย</div>
+                <div class="rep-foot">
+                  <span class="rep-user"><i class="ti ti-user-circle"></i> เทศบาลนคร ขก.</span>
+                  <button class="rep-confirm" onclick="confirmRep(this)"><i class="ti ti-thumb-up"></i> ยืนยัน <b>56</b></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1563,7 +2176,11 @@
         <i class="ti ti-sos"></i>
         <span class="nlbl">ฉุกเฉิน</span>
       </button>
-      <button id="nb-r" class="nbtn" onclick="nav('r',this)" aria-label="หน้าแจ้งเหตุ">
+      <button id="nb-r" class="nbtn" onclick="nav('r',this)" aria-label="หน้าขอความช่วยเหลือ">
+        <i class="ti ti-lifebuoy"></i>
+        <span class="nlbl">ช่วยเหลือ</span>
+      </button>
+      <button id="nb-c" class="nbtn" onclick="nav('c',this)" aria-label="หน้าแจ้งเหตุบนเส้นทาง">
         <i class="ti ti-map-pin"></i>
         <span class="nlbl">แจ้งเหตุ</span>
       </button>
@@ -1591,11 +2208,67 @@
       <button class="ov-cancel" onclick="closeOv()">ยกเลิก</button>
     </div>
 
+    <!-- ════ CROWD REPORT BOTTOM SHEET ════ -->
+    <div id="sheetBg" class="sheet-bg" onclick="closeSheet()"></div>
+    <div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-label="รายงานเหตุบนเส้นทาง">
+      <div class="sheet-grip"></div>
+      <h3>🗺️ รายงานเหตุบนเส้นทาง</h3>
+      <div class="sheet-sub">ช่วยเตือนเพื่อนบ้าน — เลือกประเภท ถ่ายรูป แล้วส่ง</div>
+
+      <div class="haz-grid">
+        <button class="haz" data-type="road" onclick="pickHaz(this)">
+          <span class="haz-emoji">🚗</span>
+          <span class="haz-txt">ถนนน้ำท่วม<br>รถเล็กผ่านไม่ได้</span>
+        </button>
+        <button class="haz" data-type="bridge" onclick="pickHaz(this)">
+          <span class="haz-emoji">🌉</span>
+          <span class="haz-txt">สะพานขาด/<br>ชำรุด</span>
+        </button>
+        <button class="haz" data-type="deep" onclick="pickHaz(this)">
+          <span class="haz-emoji">🌊</span>
+          <span class="haz-txt">น้ำท่วมสูง<br>อันตราย</span>
+        </button>
+        <button class="haz" data-type="block" onclick="pickHaz(this)">
+          <span class="haz-emoji">🚧</span>
+          <span class="haz-txt">เส้นทางปิด/<br>สิ่งกีดขวาง</span>
+        </button>
+      </div>
+
+      <!-- photo capture: opens camera on mobile -->
+      <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="onPhoto(this)">
+      <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
+        <i class="ti ti-camera"></i>
+        <div class="pb-main">ถ่ายรูป / แนบรูปสถานการณ์</div>
+        <div class="pb-sub">แตะเพื่อเปิดกล้องหรือเลือกรูปจากเครื่อง</div>
+      </div>
+      <div class="photo-preview" id="photoPrev">
+        <img id="photoImg" alt="รูปที่แนบ">
+        <button class="photo-retake" onclick="retakePhoto(event)"><i class="ti ti-refresh"></i> ถ่ายใหม่</button>
+      </div>
+
+      <textarea id="repNote" class="inp" style="margin-bottom:14px" placeholder="รายละเอียดเพิ่มเติม เช่น น้ำสูง 50 ซม. แนะนำเลี่ยงไปทาง..."></textarea>
+
+      <div class="sheet-loc">
+        <i class="ti ti-map-pin-filled"></i>
+        <div class="sheet-loc-txt">
+          <div class="sl-main" id="pinLoc">ปักหมุดตำแหน่งปัจจุบัน</div>
+          <div class="sl-sub" id="pinSub">แตะเพื่อดึงพิกัด GPS</div>
+        </div>
+        <button class="gps-btn" style="width:auto;margin:0;padding:8px 12px" onclick="pinHere()">
+          <i class="ti ti-current-location"></i> ปักหมุด
+        </button>
+      </div>
+
+      <button class="sheet-submit" onclick="submitRep()">
+        <i class="ti ti-send"></i> ส่งรายงานเตือนเพื่อนบ้าน
+      </button>
+    </div>
+
   </div><!-- /shell -->
 
   <script>
     /* ── NAV ── */
-    var PAGES = ['e', 'r', 'a', 's'], ppl = 2;
+    var PAGES = ['e', 'r', 'c', 'a', 's'], ppl = 2;
 
     function nav(id, btn) {
       PAGES.forEach(function (p) {
@@ -1739,6 +2412,124 @@
       t.classList.add('show');
       clearTimeout(window._tt);
       window._tt = setTimeout(function () { t.classList.remove('show'); }, dur || 3000);
+    }
+
+    /* ── CROWDSOURCING REPORT ── */
+    var hazType = null, hazMeta = {
+      road: { tag: 'ถนนรถเล็กผ่านไม่ได้', cls: 'rt-road', thumb: 'th-road', emoji: '🚗' },
+      bridge: { tag: 'สะพานชำรุด', cls: 'rt-bridge', thumb: 'th-bridge', emoji: '🌉' },
+      deep: { tag: 'น้ำท่วมสูง', cls: 'rt-deep', thumb: 'th-deep', emoji: '🌊' },
+      block: { tag: 'เส้นทางปิด', cls: 'rt-block', thumb: 'th-block', emoji: '🚧' }
+    };
+    var photoData = null, pinned = false;
+
+    function openSheet() {
+      document.getElementById('sheetBg').classList.add('show');
+      document.getElementById('sheet').classList.add('show');
+    }
+    function closeSheet() {
+      document.getElementById('sheetBg').classList.remove('show');
+      document.getElementById('sheet').classList.remove('show');
+    }
+
+    function pickHaz(el) {
+      document.querySelectorAll('.haz').forEach(function (h) { h.classList.remove('sel'); });
+      el.classList.add('sel');
+      hazType = el.getAttribute('data-type');
+    }
+
+    function onPhoto(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          photoData = e.target.result;
+          document.getElementById('photoImg').src = photoData;
+          document.getElementById('photoBox').style.display = 'none';
+          document.getElementById('photoPrev').classList.add('show');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    function retakePhoto(e) {
+      e.stopPropagation();
+      photoData = null;
+      document.getElementById('photoInput').value = '';
+      document.getElementById('photoBox').style.display = 'block';
+      document.getElementById('photoPrev').classList.remove('show');
+    }
+
+    function pinHere() {
+      var main = document.getElementById('pinLoc'), sub = document.getElementById('pinSub');
+      main.textContent = 'กำลังดึงพิกัด...';
+      if (navigator.geolocation && window.isSecureContext) {
+        navigator.geolocation.getCurrentPosition(
+          function (p) {
+            pinned = true;
+            main.textContent = '📍 ปักหมุดแล้ว';
+            sub.textContent = p.coords.latitude.toFixed(5) + ', ' + p.coords.longitude.toFixed(5);
+          },
+          function () {
+            pinned = true;
+            main.textContent = '📍 ปักหมุดแล้ว (ตำแหน่งโดยประมาณ)';
+            sub.textContent = 'อ.เมือง จ.ขอนแก่น';
+          },
+          { enableHighAccuracy: true, timeout: 12000 }
+        );
+      } else {
+        pinned = true;
+        main.textContent = '📍 ปักหมุดแล้ว (ตัวอย่าง)';
+        sub.textContent = 'อ.เมือง จ.ขอนแก่น';
+      }
+    }
+
+    function submitRep() {
+      if (!hazType) { toast('⚠ กรุณาเลือกประเภทเหตุการณ์', 3000, '#D97706'); return; }
+      var m = hazMeta[hazType];
+      var note = document.getElementById('repNote').value.trim() || 'ประชาชนรายงานเหตุในพื้นที่ โปรดใช้ความระมัดระวัง';
+      var locTxt = pinned ? (document.getElementById('pinSub').textContent || 'พิกัดที่ปักหมุด') : 'ตำแหน่งโดยประมาณ อ.เมือง ขก.';
+
+      var thumbInner = photoData
+        ? '<img src="' + photoData + '" alt="รูปรายงาน">'
+        : m.emoji;
+
+      var html =
+        '<div class="rep" style="border-color:rgba(52,211,153,.4)">' +
+        '<div class="rep-thumb ' + m.thumb + '">' + thumbInner + '</div>' +
+        '<div class="rep-body">' +
+        '<div class="rep-top">' +
+        '<span class="rep-tag ' + m.cls + '">' + m.tag + '</span>' +
+        '<span class="rep-time">เมื่อกี้</span>' +
+        '</div>' +
+        '<div class="rep-where">' + locTxt + '</div>' +
+        '<div class="rep-note">' + note + '</div>' +
+        '<div class="rep-foot">' +
+        '<span class="rep-user"><i class="ti ti-user-circle"></i> คุณ (รายงานใหม่)</span>' +
+        '<button class="rep-confirm" onclick="confirmRep(this)"><i class="ti ti-thumb-up"></i> ยืนยัน <b>1</b></button>' +
+        '</div></div></div>';
+
+      var feed = document.getElementById('repFeed');
+      feed.insertAdjacentHTML('afterbegin', html);
+
+      // reset
+      closeSheet();
+      hazType = null; photoData = null; pinned = false;
+      document.querySelectorAll('.haz').forEach(function (h) { h.classList.remove('sel'); });
+      document.getElementById('repNote').value = '';
+      retakePhoto({ stopPropagation: function () { } });
+      document.getElementById('pinLoc').textContent = 'ปักหมุดตำแหน่งปัจจุบัน';
+      document.getElementById('pinSub').textContent = 'แตะเพื่อดึงพิกัด GPS';
+
+      if (navigator.vibrate) navigator.vibrate(80);
+      toast('✅ ส่งรายงานแล้ว! เพื่อนบ้านจะเห็นการเตือนนี้', 4000, '#059669');
+    }
+
+    function confirmRep(btn) {
+      if (btn.classList.contains('done')) return;
+      btn.classList.add('done');
+      var b = btn.querySelector('b');
+      if (b) b.textContent = (parseInt(b.textContent, 10) + 1);
+      var ic = btn.querySelector('i');
+      if (ic) ic.className = 'ti ti-thumb-up-filled';
     }
 
     /* ── CLOCK ── */
