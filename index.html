@@ -1212,7 +1212,7 @@
     .map-box .leaflet-container {
       width: 100%;
       height: 100%;
-      background: #0A1424;
+      background: #E5E3DF;
       font-family: 'Sarabun', sans-serif
     }
 
@@ -1252,13 +1252,13 @@
     }
 
     .leaflet-control-attribution {
-      background: rgba(5, 13, 26, .7) !important;
-      color: var(--t2) !important;
+      background: rgba(255, 255, 255, .8) !important;
+      color: #555 !important;
       font-size: 9px !important
     }
 
     .leaflet-control-attribution a {
-      color: var(--t1) !important
+      color: #0078A8 !important
     }
 
     /* custom emoji pin marker */
@@ -3228,9 +3228,9 @@
     ];
 
     function tiles() {
-      return L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd', maxZoom: 19,
-        attribution: '© OpenStreetMap, © CARTO'
+      return L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        subdomains: 'abc', maxZoom: 19,
+        attribution: '© OpenStreetMap'
       });
     }
 
