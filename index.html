@@ -1069,6 +1069,179 @@
       line-height: 1.45
     }
 
+    /* Google-Maps-style nav summary */
+    .nav-summary {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(135deg, #0E2A1E, #103A2A);
+      border: 1px solid rgba(52, 211, 153, .3);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 4px
+    }
+
+    .ns-eta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      min-width: 52px
+    }
+
+    .ns-min {
+      font-size: 28px;
+      font-weight: 800;
+      color: #34D399;
+      line-height: 1
+    }
+
+    .ns-min-u {
+      font-size: 11px;
+      color: #6EE7B7
+    }
+
+    .ns-mid {
+      flex: 1;
+      min-width: 0;
+      border-left: 1px solid rgba(52, 211, 153, .2);
+      padding-left: 14px
+    }
+
+    .ns-dist {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--t0)
+    }
+
+    .ns-arr {
+      font-size: 12px;
+      color: var(--t1);
+      margin-top: 1px
+    }
+
+    .ns-via {
+      font-size: 11px;
+      color: #6EE7B7;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .ns-go {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #34D399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .ns-go .ti {
+      font-size: 22px;
+      color: #06281C
+    }
+
+    .nav-summary.loading {
+      opacity: .6
+    }
+
+    /* turn-by-turn steps */
+    .steps {
+      background: var(--bg3);
+      border: 1px solid var(--b0);
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .05)
+    }
+
+    .step:last-child {
+      border-bottom: none
+    }
+
+    .step-ico {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: rgba(14, 165, 233, .1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .step-ico .ti {
+      font-size: 18px;
+      color: #38BDF8
+    }
+
+    .step.s-start .step-ico {
+      background: rgba(52, 211, 153, .12)
+    }
+
+    .step.s-start .step-ico .ti {
+      color: #34D399
+    }
+
+    .step.s-end .step-ico {
+      background: rgba(232, 56, 12, .12)
+    }
+
+    .step.s-end .step-ico .ti {
+      color: #F87A60
+    }
+
+    .step-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .step-main {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t0);
+      line-height: 1.35
+    }
+
+    .step-road {
+      font-size: 11px;
+      color: var(--t1);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .step-dist {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t1);
+      flex-shrink: 0
+    }
+
+    .step-warn {
+      background: rgba(245, 158, 11, .08);
+      border-left: 3px solid var(--amber)
+    }
+
+    .step-warn .step-ico {
+      background: rgba(245, 158, 11, .14)
+    }
+
+    .step-warn .step-ico .ti {
+      color: #FBBF24
+    }
+
     /* hotspot row */
     .hot {
       background: var(--bg3);
@@ -2847,15 +3020,27 @@
             <p>เส้นทางนำทางหลบโซนน้ำท่วมลึก ไปหาผู้ประสบภัย</p>
           </div>
 
-          <div class="map-box" id="routeMap" style="height:240px"></div>
-          <div class="route-info" id="routeInfo">
-            <div class="ri-item"><i class="ti ti-route" style="color:#34D399"></i>
-              <div><div class="ri-main" id="riDist">เส้นทางปลอดภัย 4.2 กม.</div>
-                <div class="ri-sub" id="riNote">หลบโซนน้ำท่วมลึกบนถนนเพชรบุรี · ถึงใน ~11 นาที</div></div>
+          <div class="map-box" id="routeMap" style="height:260px"></div>
+
+          <!-- สรุปการนำทางแบบ Google Maps -->
+          <div class="nav-summary" id="navSummary">
+            <div class="ns-eta">
+              <div class="ns-min" id="nsMin">11</div>
+              <div class="ns-min-u">นาที</div>
             </div>
+            <div class="ns-mid">
+              <div class="ns-dist" id="nsDist">4.2 กม.</div>
+              <div class="ns-arr" id="nsArr">ถึงประมาณ 14:32 น.</div>
+              <div class="ns-via" id="nsVia">หลบโซนน้ำท่วมลึก · เส้นทางเร็วสุด</div>
+            </div>
+            <div class="ns-go"><i class="ti ti-navigation"></i></div>
           </div>
 
-          <div class="sec-lbl" style="padding:0 2px;margin:4px 0 10px">รายการภารกิจ — แตะเพื่อนำทาง</div>
+          <!-- เลี้ยวต่อเลี้ยว (turn-by-turn) -->
+          <div class="sec-lbl" style="padding:0 2px;margin:14px 0 8px">รายละเอียดเส้นทาง (เลี้ยวต่อเลี้ยว)</div>
+          <div class="steps" id="routeSteps"></div>
+
+          <div class="sec-lbl" style="padding:0 2px;margin:16px 0 10px">รายการภารกิจ — แตะเพื่อนำทาง</div>
           <div id="missionList"></div>
         </div>
       </div>
@@ -3449,19 +3634,21 @@
       { pri: 'p2', where: 'ถนนสุขุมวิท ซอย 39 เขตวัฒนา', ll: [13.7308, 100.5690], meta: '👥 3 คน · ต้องการเรือ · น้ำสูง 1.2 ม.', dist: '4.2 กม.', eta: '11 นาที', avoid: 'หลบจุดน้ำลึกบนถนนเพชรบุรี ใช้ทางด่วนเฉลิมมหานคร' },
       { pri: 'p3', where: 'ชุมชนเยาวราช เขตสัมพันธวงศ์', ll: [13.7400, 100.5100], meta: '👥 2 คน · เสบียงหมด · รอรับของ', dist: '3.1 กม.', eta: '9 นาที', avoid: 'เส้นทางปกติผ่านได้ ระวังจราจรหนาแน่น' }
     ];
-    var routeMapObj = null, routeLine = null, victimMarker = null, floodZone = null, baseMarker = null;
+    var routeMapObj = null, routeCasing = null, routeLine = null, victimMarker = null, floodZone = null, baseMarker = null, detourMarker = null;
 
-    // สร้างเส้นทาง "อ้อม" โซนน้ำท่วม (จุดกึ่งกลางเบนออกจากเส้นตรง)
-    function buildRoute(a, b) {
+    // จุดเบี่ยง (via) เพื่อบังคับให้เส้นทางอ้อมโซนน้ำท่วม — คำนวณจากเส้น base→victim
+    function detourPoint(a, b) {
       var midLat = (a[0] + b[0]) / 2, midLng = (a[1] + b[1]) / 2;
-      var bend = [midLat + 0.012, midLng - 0.006]; // เบนหลบโซนน้ำท่วม
-      return [a, bend, b];
+      return [midLat + 0.011, midLng - 0.006];
+    }
+    function floodPoint(a, b) {
+      return [(a[0] + b[0]) / 2 - 0.004, (a[1] + b[1]) / 2 + 0.002];
     }
 
     function initRouteMap() {
       if (typeof L === 'undefined') { mapUnavailable('routeMap'); renderMissions(); return; }
       if (!routeMapObj) {
-        routeMapObj = L.map('routeMap', { zoomControl: true, attributionControl: false }).setView(BKK, 12);
+        routeMapObj = L.map('routeMap', { zoomControl: true, attributionControl: true }).setView(BKK, 12);
         tiles().addTo(routeMapObj);
         baseMarker = L.marker(BASE, {
           icon: L.divIcon({ className: '', html: '<div class="pin pin-deep"><span>🚁</span></div>', iconSize: [34, 34], iconAnchor: [17, 34] })
@@ -3486,33 +3673,136 @@
       el.dataset.built = '1';
     }
 
+    // วาดเส้นทางแบบ Google Maps (มีเส้นขอบเข้ม + เส้นสีทับ)
+    function drawRoute(latlngs, fly) {
+      if (routeCasing) routeMapObj.removeLayer(routeCasing);
+      if (routeLine) routeMapObj.removeLayer(routeLine);
+      routeCasing = L.polyline(latlngs, { color: '#0B5C3F', weight: 11, opacity: .9, lineJoin: 'round', lineCap: 'round' }).addTo(routeMapObj);
+      routeLine = L.polyline(latlngs, { color: '#34D399', weight: 6, opacity: 1, lineJoin: 'round', lineCap: 'round' }).addTo(routeMapObj);
+      if (fly) routeMapObj.fitBounds(routeLine.getBounds(), { padding: [45, 45] });
+    }
+
+    // แปลคำสั่งเลี้ยวจาก OSRM → ภาษาไทย + ไอคอน
+    function maneuverTH(s) {
+      var t = s.maneuver.type, mod = s.maneuver.modifier || '', road = s.name || '';
+      var icon = 'ti-arrow-narrow-up', txt = 'ตรงไป';
+      if (t === 'depart') { icon = 'ti-current-location'; txt = 'ออกเดินทางจากฐานกู้ภัย'; }
+      else if (t === 'arrive') { icon = 'ti-flag-3'; txt = 'ถึงจุดผู้ประสบภัย'; }
+      else if (t === 'roundabout' || t === 'rotary') { icon = 'ti-rotate-clockwise-2'; txt = 'เข้าวงเวียน'; }
+      else if (t === 'merge') { icon = 'ti-arrow-merge'; txt = 'รวมเลน'; }
+      else if (t === 'on ramp' || t === 'ramp') { icon = 'ti-arrow-ramp-right-2'; txt = 'ขึ้นทางด่วน/ทางขึ้น'; }
+      else if (t === 'off ramp') { icon = 'ti-arrow-ramp-right'; txt = 'ออกทางลง'; }
+      else {
+        if (mod.indexOf('left') >= 0) {
+          icon = mod.indexOf('slight') >= 0 ? 'ti-arrow-bear-left-2' : 'ti-arrow-left';
+          txt = mod.indexOf('slight') >= 0 ? 'เบี่ยงซ้าย' : (mod.indexOf('sharp') >= 0 ? 'เลี้ยวซ้ายหักศอก' : 'เลี้ยวซ้าย');
+        } else if (mod.indexOf('right') >= 0) {
+          icon = mod.indexOf('slight') >= 0 ? 'ti-arrow-bear-right-2' : 'ti-arrow-right';
+          txt = mod.indexOf('slight') >= 0 ? 'เบี่ยงขวา' : (mod.indexOf('sharp') >= 0 ? 'เลี้ยวขวาหักศอก' : 'เลี้ยวขวา');
+        } else if (mod === 'uturn') { icon = 'ti-arrow-back-up'; txt = 'กลับรถ'; }
+        else { icon = 'ti-arrow-narrow-up'; txt = 'ตรงไป'; }
+      }
+      return { icon: icon, txt: txt, road: road };
+    }
+
+    function fmtDist(mtr) {
+      return mtr >= 1000 ? (mtr / 1000).toFixed(1) + ' กม.' : Math.round(mtr) + ' ม.';
+    }
+
+    function renderSteps(steps, avoidNote) {
+      var el = document.getElementById('routeSteps');
+      if (!el) return;
+      var html = '';
+      // แทรกหมายเหตุหลบโซนน้ำท่วมไว้ต้นรายการ
+      html += '<div class="step step-warn"><div class="step-ico"><i class="ti ti-alert-triangle"></i></div>' +
+        '<div class="step-body"><div class="step-main">เลี่ยงโซนน้ำท่วมลึก</div>' +
+        '<div class="step-road">' + (avoidNote || 'ระบบจัดเส้นทางอ้อมพื้นที่น้ำท่วมให้อัตโนมัติ') + '</div></div></div>';
+      steps.forEach(function (s) {
+        var m = maneuverTH(s);
+        var cls = s.maneuver.type === 'depart' ? ' s-start' : (s.maneuver.type === 'arrive' ? ' s-end' : '');
+        html += '<div class="step' + cls + '"><div class="step-ico"><i class="ti ' + m.icon + '"></i></div>' +
+          '<div class="step-body"><div class="step-main">' + m.txt + (m.road ? ' เข้าสู่ ' + m.road : '') + '</div>' +
+          (m.road ? '<div class="step-road">' + m.road + '</div>' : '') + '</div>' +
+          (s.distance ? '<div class="step-dist">' + fmtDist(s.distance) + '</div>' : '') + '</div>';
+      });
+      el.innerHTML = html;
+    }
+
+    // เส้นทางสำรอง (เมื่อ OSRM/อินเทอร์เน็ตใช้ไม่ได้) — เส้นเบนหลบ + ขั้นตอนจำลอง
+    function fallbackRoute(m, via, fly) {
+      drawRoute([BASE, via, m.ll], fly);
+      setNavSummary(parseFloat(m.dist), parseInt(m.eta), m.avoid + ' · เส้นทางเร็วสุด');
+      renderSteps([
+        { maneuver: { type: 'depart' }, name: 'ถนนหน้าฐานกู้ภัย', distance: 600 },
+        { maneuver: { type: 'turn', modifier: 'right' }, name: 'ถนนสายหลัก', distance: 1400 },
+        { maneuver: { type: 'turn', modifier: 'slight left' }, name: 'เส้นเลี่ยงน้ำท่วม', distance: 1200 },
+        { maneuver: { type: 'turn', modifier: 'left' }, name: 'ถนนเข้าชุมชน', distance: 700 },
+        { maneuver: { type: 'arrive' }, name: m.where, distance: 0 }
+      ], m.avoid);
+    }
+
+    function setNavSummary(km, min, via) {
+      var now = new Date(); now.setMinutes(now.getMinutes() + (min || 0));
+      var hh = now.getHours().toString().padStart(2, '0'), mm = now.getMinutes().toString().padStart(2, '0');
+      var el;
+      if ((el = document.getElementById('nsMin'))) el.textContent = (min || '–');
+      if ((el = document.getElementById('nsDist'))) el.textContent = (km ? km.toFixed(1) : '–') + ' กม.';
+      if ((el = document.getElementById('nsArr'))) el.textContent = 'ถึงประมาณ ' + hh + ':' + mm + ' น.';
+      if ((el = document.getElementById('nsVia'))) el.textContent = via || 'เส้นทางเร็วสุด';
+      var ns = document.getElementById('navSummary'); if (ns) ns.classList.remove('loading');
+    }
+
     function selectMission(i, fly) {
       var m = MISSIONS[i];
       document.querySelectorAll('#missionList .case').forEach(function (c) { c.classList.remove('sel'); });
       var row = document.getElementById('mis-' + i); if (row) row.classList.add('sel');
+      if (!routeMapObj) return;
 
-      if (routeMapObj) {
-        var path = buildRoute(BASE, m.ll);
-        if (routeLine) routeMapObj.removeLayer(routeLine);
-        if (victimMarker) routeMapObj.removeLayer(victimMarker);
-        if (floodZone) routeMapObj.removeLayer(floodZone);
+      var via = detourPoint(BASE, m.ll), fz = floodPoint(BASE, m.ll);
 
-        // โซนน้ำท่วมลึกที่ต้องหลบ (วางใกล้เส้นตรง base→victim)
-        var fz = [(BASE[0] + m.ll[0]) / 2 - 0.004, (BASE[1] + m.ll[1]) / 2 + 0.002];
-        floodZone = L.circle(fz, { radius: 700, color: '#0EA5E9', weight: 1, fillColor: '#0EA5E9', fillOpacity: .22 })
-          .addTo(routeMapObj).bindPopup('<span class="pp-tag">โซนน้ำท่วมลึก</span><br>หลีกเลี่ยงเส้นทางนี้');
+      // โซนน้ำท่วมลึกที่ต้องหลบ
+      if (floodZone) routeMapObj.removeLayer(floodZone);
+      floodZone = L.circle(fz, { radius: 650, color: '#0EA5E9', weight: 1, fillColor: '#0EA5E9', fillOpacity: .22 })
+        .addTo(routeMapObj).bindPopup('<span class="pp-tag">โซนน้ำท่วมลึก</span><br>หลีกเลี่ยงเส้นทางนี้');
 
-        routeLine = L.polyline(path, { color: '#34D399', weight: 5, opacity: .9, dashArray: '1,0' }).addTo(routeMapObj);
-        victimMarker = L.marker(m.ll, {
-          icon: L.divIcon({ className: '', html: '<div class="pin pin-road"><span>🆘</span></div>', iconSize: [34, 34], iconAnchor: [17, 34] })
-        }).addTo(routeMapObj).bindPopup('<span class="pp-tag">ผู้ประสบภัย</span><br><b>' + m.where + '</b>');
+      // หมุดผู้ประสบภัย
+      if (victimMarker) routeMapObj.removeLayer(victimMarker);
+      victimMarker = L.marker(m.ll, {
+        icon: L.divIcon({ className: '', html: '<div class="pin pin-road"><span>🆘</span></div>', iconSize: [34, 34], iconAnchor: [17, 34] })
+      }).addTo(routeMapObj).bindPopup('<span class="pp-tag">ผู้ประสบภัย</span><br><b>' + m.where + '</b>');
 
-        if (fly) routeMapObj.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+      // สถานะกำลังคำนวณ
+      var ns = document.getElementById('navSummary'); if (ns) ns.classList.add('loading');
+      if (fly) toast('🧭 กำลังคำนวณเส้นทางไป: ' + m.where, 2500, '#0EA5E9');
+
+      // เรียก OSRM (เส้นทางตามถนนจริง แบบ Google Maps) ผ่านจุดเบี่ยงหลบน้ำท่วม
+      if (typeof fetch === 'function') {
+        var coords = [BASE, via, m.ll].map(function (p) { return p[1] + ',' + p[0]; }).join(';');
+        var url = 'https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson&steps=true';
+        fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+          if (!data.routes || !data.routes.length) throw new Error('no route');
+          var rt = data.routes[0];
+          var latlngs = rt.geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+          drawRoute(latlngs, fly);
+          var steps = [];
+          rt.legs.forEach(function (lg) {
+            lg.steps.forEach(function (s) {
+              // ตัด depart/arrive ซ้ำของจุดเบี่ยงกลางออก
+              if (s.maneuver.type === 'arrive' && s.distance === 0 && steps.length) {
+                if (latlngs.length && (rt.legs.indexOf(lg) < rt.legs.length - 1)) return;
+              }
+              if (s.maneuver.type === 'depart' && steps.length) return;
+              steps.push(s);
+            });
+          });
+          renderSteps(steps, m.avoid);
+          setNavSummary(rt.distance / 1000, Math.round(rt.duration / 60), m.avoid + ' · เส้นทางเร็วสุด');
+        }).catch(function () {
+          fallbackRoute(m, via, fly);
+        });
+      } else {
+        fallbackRoute(m, via, fly);
       }
-      var d = document.getElementById('riDist'), n = document.getElementById('riNote');
-      if (d) d.textContent = 'เส้นทางปลอดภัย ' + m.dist;
-      if (n) n.textContent = m.avoid + ' · ถึงใน ~' + m.eta;
-      if (fly) toast('🧭 เริ่มนำทางไป: ' + m.where, 2800, '#0EA5E9');
     }
 
     /* ── CROWDSOURCING REPORT ── */
