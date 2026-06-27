@@ -1309,6 +1309,31 @@
       box-shadow: 0 0 0 6px rgba(52, 211, 153, .18)
     }
 
+    /* live citizen report marker (pulsing) on crisis map */
+    .pin-live {
+      width: 16px;
+      height: 16px;
+      background: var(--c, #E8380C);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--c, #E8380C) 30%, transparent), 0 2px 6px rgba(0, 0, 0, .4);
+      animation: livePulse 1.6s ease-out infinite
+    }
+
+    @keyframes livePulse {
+      0% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--c, #E8380C) 55%, transparent), 0 2px 6px rgba(0, 0, 0, .4)
+      }
+
+      70% {
+        box-shadow: 0 0 0 16px transparent, 0 2px 6px rgba(0, 0, 0, .4)
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 transparent, 0 2px 6px rgba(0, 0, 0, .4)
+      }
+    }
+
     /* map legend */
     .map-legend {
       display: flex;
@@ -2740,7 +2765,7 @@
           <div class="kpi-grid">
             <div class="kpi kpi-red">
               <div class="kpi-top"><i class="ti ti-sos"></i><span class="kpi-trend">▲ 12</span></div>
-              <div class="kpi-val">47</div>
+              <div class="kpi-val" id="kpiSos">47</div>
               <div class="kpi-lbl">SOS รอช่วยเหลือ</div>
             </div>
             <div class="kpi kpi-amber">
@@ -3101,14 +3126,20 @@
       if (navigator.geolocation && window.isSecureContext) {
         navigator.geolocation.getCurrentPosition(
           function (p) {
-            var lat = p.coords.latitude.toFixed(5), lng = p.coords.longitude.toFixed(5);
-            setTimeout(function () { toast('📍 ส่งพิกัด ' + lat + ', ' + lng + ' ให้เจ้าหน้าที่แล้ว', 4000, '#0EA5E9'); }, 1200);
+            var lat = p.coords.latitude, lng = p.coords.longitude;
+            reportToCrisis([lat, lng], 'sos', 'SOS ฉุกเฉิน', 'ตำแหน่งผู้กด SOS');
+            setTimeout(function () { toast('📍 ส่งพิกัด ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + ' ให้เจ้าหน้าที่แล้ว', 4000, '#0EA5E9'); }, 1200);
           },
           function () {
-            setTimeout(function () { toast('⚠ ไม่สามารถดึงพิกัดอัตโนมัติได้ กรุณาแจ้งที่อยู่ทางโทรศัพท์', 4000, '#D97706'); }, 1200);
+            reportToCrisis(demoLatLng(), 'sos', 'SOS ฉุกเฉิน', 'ตำแหน่งผู้กด SOS (โดยประมาณ)');
+            setTimeout(function () { toast('📍 ส่งสัญญาณ SOS ให้ศูนย์กู้ภัยแล้ว (ตำแหน่งโดยประมาณ)', 4000, '#0EA5E9'); }, 1200);
           },
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
+      } else {
+        // โหมดตัวอย่าง (file://) — ส่งตำแหน่งโดยประมาณไปแผนที่วิกฤต
+        reportToCrisis(demoLatLng(), 'sos', 'SOS ฉุกเฉิน', 'ตำแหน่งผู้กด SOS (โดยประมาณ)');
+        setTimeout(function () { toast('📍 ส่งสัญญาณ SOS ให้ศูนย์กู้ภัยแล้ว', 4000, '#0EA5E9'); }, 1200);
       }
     }
     document.getElementById('ov').addEventListener('click', function (e) { if (e.target === this) closeOv(); });
@@ -3188,6 +3219,9 @@
         btn.style.background = 'var(--green)';
         btn.style.boxShadow = '0 6px 28px rgba(5,150,105,.28)';
         toast('✅ ส่งคำขอสำเร็จ! เจ้าหน้าที่จะโทรกลับภายใน 15 นาที', 5000, '#059669');
+        // ส่งจุดขอความช่วยเหลือไปแผนที่วิกฤตฝั่งกู้ภัย
+        var ll = parseLatLng(loc) || demoLatLng();
+        reportToCrisis(ll, 'help', 'ขอความช่วยเหลือ (' + ppl + ' คน)', loc);
         setTimeout(function () {
           btn.innerHTML = '<i class="ti ti-send" style="font-size:20px"></i> ส่งคำขอความช่วยเหลือ';
           btn.disabled = false; btn.style.background = 'var(--red)'; btn.style.boxShadow = '0 6px 28px rgba(232,56,12,.28)';
@@ -3319,6 +3353,12 @@
       }
       if (crisisMapObj) setTimeout(function () { crisisMapObj.invalidateSize(); }, 60);
 
+      // ชั้นแสดง "รายงานสด" จากประชาชน (SOS / ขอความช่วยเหลือ / แจ้งเหตุ)
+      if (crisisMapObj && !liveLayer) {
+        liveLayer = L.layerGroup().addTo(crisisMapObj);
+        liveReports.forEach(crisisAddLive);
+      }
+
       // ranked hotspot list
       if (listEl && !listEl.dataset.built) {
         var max = HOTSPOTS[0].sos;
@@ -3339,6 +3379,64 @@
       var h = HOTSPOTS[i];
       if (crisisMapObj) crisisMapObj.flyTo(h.ll, 14, { duration: 1 });
       toast('🎯 โฟกัสจุด: ' + h.where, 2500, '#E8380C');
+    }
+
+    /* ══════════════════════════════════════
+       LIVE PIPELINE — ส่งทุกการแจ้งจากประชาชน
+       (SOS / ขอความช่วยเหลือ / แจ้งเหตุ) ไปแผนที่วิกฤตฝั่งกู้ภัย
+    ══════════════════════════════════════ */
+    var liveReports = [];     // {ll, kind, label}
+    var liveLayer = null;     // L.layerGroup บน crisisMap
+    var sosBase = 47;         // ค่าตั้งต้นของ KPI "SOS รอช่วยเหลือ"
+
+    function liveColor(k) {
+      return k === 'sos' ? '#E8380C'
+        : k === 'help' ? '#F59E0B'
+          : k === 'road' ? '#E8380C'
+            : k === 'bridge' ? '#F59E0B'
+              : k === 'deep' ? '#0EA5E9'
+                : k === 'block' ? '#8B5CF6' : '#E8380C';
+    }
+    function liveEmoji(k) {
+      return k === 'sos' ? '🆘' : k === 'help' ? '🙋' :
+        k === 'road' ? '🚗' : k === 'bridge' ? '🌉' : k === 'deep' ? '🌊' : k === 'block' ? '🚧' : '📍';
+    }
+
+    function crisisAddLive(r) {
+      if (!crisisMapObj || !liveLayer) return;
+      var c = liveColor(r.kind);
+      // วงความร้อนจุดใหม่
+      L.circle(r.ll, { radius: 380, color: c, weight: 0, fillColor: c, fillOpacity: .30 }).addTo(liveLayer);
+      // หมุดกระพริบ (รายงานสด)
+      L.marker(r.ll, {
+        icon: L.divIcon({ className: '', html: '<div class="pin-live" style="--c:' + c + '"></div>', iconSize: [16, 16], iconAnchor: [8, 8] })
+      }).addTo(liveLayer)
+        .bindPopup('<span class="pp-tag" style="color:' + c + '">' + liveEmoji(r.kind) + ' ' + r.label + ' (รายงานสด)</span><br><b>' + r.where + '</b>');
+    }
+
+    // ฟังก์ชันกลาง — เรียกจากทุกการแจ้งของประชาชน
+    function reportToCrisis(ll, kind, label, where) {
+      var r = { ll: ll, kind: kind, label: label, where: where || (ll[0].toFixed(4) + ', ' + ll[1].toFixed(4)) };
+      liveReports.push(r);
+
+      // อัปเดต KPI จำนวน SOS รอช่วยเหลือ (ฝั่งกู้ภัย)
+      sosBase += 1;
+      var k = document.getElementById('kpiSos');
+      if (k) k.textContent = sosBase;
+
+      // ถ้าแผนที่วิกฤตถูกสร้างแล้ว ปักลงทันที (เรียลไทม์)
+      if (crisisMapObj) {
+        if (!liveLayer) liveLayer = L.layerGroup().addTo(crisisMapObj);
+        crisisAddLive(r);
+      }
+      // ถ้ายังไม่เปิดแผนที่วิกฤต ระบบจะปักให้อัตโนมัติเมื่อเปิด (flush ใน initCrisisMap)
+    }
+
+    // อ่านพิกัดจากช่องที่อยู่ (กรณีกรอกเป็น "lat, lng")
+    function parseLatLng(s) {
+      if (!s) return null;
+      var m = s.match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+      return m ? [parseFloat(m[1]), parseFloat(m[2])] : null;
     }
 
     /* ══════════════════════════════════════
@@ -3525,6 +3623,8 @@
         addCrowdMarker(hazType, ll, locTxt);
         crowdMapObj.flyTo(ll, 15, { duration: 1 });
       }
+      // ส่งจุดแจ้งเหตุไปแผนที่วิกฤตฝั่งกู้ภัยด้วย
+      reportToCrisis(ll, hazType, m.tag, locTxt);
 
       // reset
       closeSheet();
