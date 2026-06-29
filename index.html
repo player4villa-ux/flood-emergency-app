@@ -677,6 +677,94 @@
       line-height: 1.6
     }
 
+    /* address search + suggestions */
+    .loc-search {
+      position: relative
+    }
+
+    .sugg-box {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--bg4);
+      border: 1px solid var(--b1);
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 50;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+      max-height: 240px;
+      overflow-y: auto
+    }
+
+    .sugg {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 11px 13px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+      transition: background .12s
+    }
+
+    .sugg:last-child {
+      border-bottom: none
+    }
+
+    .sugg:active,
+    .sugg:hover {
+      background: rgba(14, 165, 233, .1)
+    }
+
+    .sugg .ti {
+      font-size: 16px;
+      color: var(--blue);
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .sugg span {
+      font-size: 12.5px;
+      color: var(--t0);
+      line-height: 1.4
+    }
+
+    .sugg-empty {
+      padding: 12px 13px;
+      font-size: 12px;
+      color: var(--t2);
+      text-align: center
+    }
+
+    .loc-confirm {
+      width: 100%;
+      margin-top: 8px;
+      background: var(--green);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      color: #fff;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 18px rgba(5, 150, 105, .25);
+      transition: transform .1s
+    }
+
+    .loc-confirm:active {
+      transform: scale(.98)
+    }
+
+    .loc-confirm .ti {
+      font-size: 17px
+    }
+
     .gps-btn {
       width: 100%;
       margin-top: 8px;
@@ -2613,7 +2701,14 @@
 
           <div class="fc">
             <label class="flbl" for="loc">ที่อยู่ / ตำแหน่งของคุณ</label>
-            <input type="text" id="loc" class="inp" placeholder="บ้านเลขที่ หมู่บ้าน ตำบล อำเภอ จังหวัด">
+            <div class="loc-search">
+              <input type="text" id="loc" class="inp" autocomplete="off" oninput="locInput()"
+                placeholder="พิมพ์ชื่อสถานที่ / บ้านเลขที่ ถนน เขต...">
+              <div class="sugg-box" id="locSuggest"></div>
+            </div>
+            <button class="loc-confirm" id="locConfirm" style="display:none" onclick="confirmLoc()">
+              <i class="ti ti-circle-check"></i> ยืนยันตำแหน่ง (แปลงเป็นพิกัด)
+            </button>
             <button class="gps-btn" id="gpsbtn" onclick="doGPS()">
               <i class="ti ti-map-pin"></i> ดึงพิกัด GPS อัตโนมัติ
             </button>
@@ -3349,10 +3444,143 @@
       btn.innerHTML = '<i class="ti ti-circle-check" style="font-size:16px"></i> ' + (isDemo ? 'แสดงตำแหน่งตัวอย่างบนแผนที่' : 'ดึงพิกัด GPS สำเร็จ');
       btn.style.color = '#34D399'; btn.style.borderColor = 'rgba(5,150,105,.35)';
       btn.disabled = false;
+      closeSuggest(); toggleLocConfirm(false); geoSel = null;
       showMiniMap('helpMap', [lat, lng]);
     }
 
-    // ตำแหน่งตัวอย่างแบบสุ่มรอบกรุงเทพฯ (ใช้เมื่อเปิดแบบ file:// หรือ GPS ใช้งานไม่ได้)
+    /* ══════════════════════════════════════
+       ADDRESS SEARCH (Geocoding) — ค้นหาที่อยู่ → พิกัด
+    ══════════════════════════════════════ */
+    // สถานที่ตัวอย่างในกรุงเทพฯ (ใช้เป็น fallback เมื่อออฟไลน์/ค้นออนไลน์ไม่ได้)
+    var SAMPLE_PLACES = [
+      { name: 'พระบรมมหาราชวัง / วัดพระแก้ว เขตพระนคร', ll: [13.7510, 100.4927] },
+      { name: 'สยามพารากอน เขตปทุมวัน', ll: [13.7466, 100.5347] },
+      { name: 'เซ็นทรัลเวิลด์ เขตปทุมวัน', ll: [13.7466, 100.5396] },
+      { name: 'อนุสาวรีย์ชัยสมรภูมิ เขตราชเทวี', ll: [13.7649, 100.5383] },
+      { name: 'สถานีกลางกรุงเทพอภิวัฒน์ (บางซื่อ)', ll: [13.8021, 100.5398] },
+      { name: 'ตลาดนัดจตุจักร เขตจตุจักร', ll: [13.7999, 100.5503] },
+      { name: 'มหาวิทยาลัยรามคำแหง เขตบางกะปิ', ll: [13.7556, 100.6206] },
+      { name: 'โรงพยาบาลรามาธิบดี เขตราชเทวี', ll: [13.7666, 100.5260] },
+      { name: 'ถนนสุขุมวิท (อโศก) เขตวัฒนา', ll: [13.7376, 100.5602] },
+      { name: 'ถนนเยาวราช เขตสัมพันธวงศ์', ll: [13.7400, 100.5100] },
+      { name: 'เขตบางกะปิ กรุงเทพมหานคร', ll: [13.7657, 100.6477] },
+      { name: 'เขตวังทองหลาง กรุงเทพมหานคร', ll: [13.7779, 100.6103] },
+      { name: 'ซอยลาดพร้าว 101 เขตบางกะปิ', ll: [13.7780, 100.6430] },
+      { name: 'ท่าอากาศยานดอนเมือง เขตดอนเมือง', ll: [13.9126, 100.6068] }
+    ];
+    var geoSel = null, geoTimer = null, geoCache = {};
+
+    function locInput() {
+      geoSel = null;
+      var q = document.getElementById('loc').value.trim();
+      toggleLocConfirm(q.length > 0);
+      clearTimeout(geoTimer);
+      if (parseLatLng(q)) { closeSuggest(); return; } // เป็นพิกัดอยู่แล้ว ไม่ต้องค้นหา
+      if (q.length < 3) { closeSuggest(); return; }
+      geoTimer = setTimeout(function () { searchPlaces(q); }, 550);
+    }
+
+    function searchPlaces(q) {
+      if (typeof fetch === 'function' && navigator.onLine !== false && window.isSecureContext) {
+        var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=th&accept-language=th&q=' + encodeURIComponent(q);
+        fetch(url).then(function (r) { return r.json(); }).then(function (list) {
+          if (!list || !list.length) { fallbackSuggest(q); return; }
+          renderSuggest(list.map(function (it) {
+            return { name: it.display_name, lat: parseFloat(it.lat), lon: parseFloat(it.lon) };
+          }));
+        }).catch(function () { fallbackSuggest(q); });
+      } else { fallbackSuggest(q); }
+    }
+
+    function fallbackSuggest(q) {
+      var ql = q.toLowerCase();
+      var hits = SAMPLE_PLACES.filter(function (p) { return p.name.toLowerCase().indexOf(ql) >= 0; });
+      if (!hits.length) hits = SAMPLE_PLACES.slice(0, 6);
+      renderSuggest(hits.map(function (p) { return { name: p.name, lat: p.ll[0], lon: p.ll[1] }; }));
+    }
+
+    function renderSuggest(items) {
+      var box = document.getElementById('locSuggest');
+      geoCache = {};
+      if (!items.length) { box.innerHTML = '<div class="sugg-empty">ไม่พบสถานที่ที่ตรงกัน</div>'; box.style.display = 'block'; return; }
+      box.innerHTML = items.map(function (it, i) {
+        geoCache[i] = it;
+        return '<div class="sugg" onclick="pickPlace(' + i + ')"><i class="ti ti-map-pin"></i><span>' + it.name + '</span></div>';
+      }).join('');
+      box.style.display = 'block';
+    }
+
+    function pickPlace(i) {
+      var it = geoCache[i];
+      if (!it) return;
+      geoSel = { lat: it.lat, lon: it.lon, name: it.name };
+      document.getElementById('loc').value = it.name;
+      closeSuggest();
+      toggleLocConfirm(true);
+    }
+
+    function closeSuggest() {
+      var b = document.getElementById('locSuggest');
+      if (b) b.style.display = 'none';
+    }
+
+    function toggleLocConfirm(show) {
+      var b = document.getElementById('locConfirm');
+      if (b) b.style.display = show ? 'flex' : 'none';
+    }
+
+    function restoreConfirmBtn() {
+      var b = document.getElementById('locConfirm');
+      if (b) b.innerHTML = '<i class="ti ti-circle-check"></i> ยืนยันตำแหน่ง (แปลงเป็นพิกัด)';
+    }
+
+    function fallbackOne(q) {
+      var ql = q.toLowerCase();
+      for (var i = 0; i < SAMPLE_PLACES.length; i++) {
+        if (SAMPLE_PLACES[i].name.toLowerCase().indexOf(ql) >= 0) return SAMPLE_PLACES[i].ll;
+      }
+      return demoLatLng();
+    }
+
+    function applyLoc(lat, lon, isDemo) {
+      document.getElementById('loc').value = lat.toFixed(5) + ', ' + lon.toFixed(5);
+      geoSel = null;
+      closeSuggest();
+      toggleLocConfirm(false);
+      showMiniMap('helpMap', [lat, lon]);
+      toast('📍 ยืนยันตำแหน่งแล้ว — ปักหมุดบนแผนที่' + (isDemo ? ' (ตำแหน่งตัวอย่าง)' : ''), 3000, '#059669');
+    }
+
+    // กดยืนยัน → แปลงที่อยู่เป็นพิกัด Latitude, Longitude แล้วปักหมุด
+    function confirmLoc() {
+      var q = document.getElementById('loc').value.trim();
+      if (!q) { toast('⚠ กรุณาพิมพ์ชื่อสถานที่หรือที่อยู่ก่อน', 3000, '#D97706'); return; }
+
+      var coords = parseLatLng(q);
+      if (geoSel) { applyLoc(geoSel.lat, geoSel.lon); return; }
+      if (coords) { applyLoc(coords[0], coords[1]); return; }
+
+      var btn = document.getElementById('locConfirm');
+      btn.innerHTML = '<i class="ti ti-loader"></i> กำลังค้นหาพิกัด...';
+      if (typeof fetch === 'function' && navigator.onLine !== false && window.isSecureContext) {
+        var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=th&accept-language=th&q=' + encodeURIComponent(q);
+        fetch(url).then(function (r) { return r.json(); }).then(function (list) {
+          restoreConfirmBtn();
+          if (list && list.length) applyLoc(parseFloat(list[0].lat), parseFloat(list[0].lon));
+          else { var p = fallbackOne(q); applyLoc(p[0], p[1], true); }
+        }).catch(function () { restoreConfirmBtn(); var p = fallbackOne(q); applyLoc(p[0], p[1], true); });
+      } else {
+        restoreConfirmBtn();
+        var p = fallbackOne(q); applyLoc(p[0], p[1], true);
+      }
+    }
+
+    // ปิด dropdown เมื่อคลิกนอกช่องค้นหา
+    document.addEventListener('click', function (e) {
+      var s = e.target.closest && e.target.closest('.loc-search');
+      if (!s) closeSuggest();
+    });
+
     function demoLatLng() {
       return [BKK[0] + (Math.random() - .5) * .03, BKK[1] + (Math.random() - .5) * .03];
     }
