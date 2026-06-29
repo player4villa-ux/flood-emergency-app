@@ -1497,9 +1497,42 @@
     }
 
     .leaflet-popup-content .pp-tag {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--blue)
+    }
+
+    .pp-card .pp-live {
+      font-size: 9px;
+      font-weight: 700;
+      color: #34D399;
+      margin-left: 6px
+    }
+
+    .pp-card .pp-where {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t0);
+      margin: 5px 0 6px;
+      line-height: 1.35
+    }
+
+    .pp-card .pp-row {
+      font-size: 11.5px;
+      color: var(--t1);
+      line-height: 1.6;
+      border-top: 1px solid rgba(255, 255, 255, .07);
+      padding-top: 3px;
+      margin-top: 3px
+    }
+
+    .pp-card .pp-row:first-of-type {
+      border-top: none
+    }
+
+    .pp-card .pp-k {
+      color: var(--t2);
+      font-size: 10.5px
     }
 
     .leaflet-popup-close-button {
@@ -3632,9 +3665,14 @@
         btn.style.background = 'var(--green)';
         btn.style.boxShadow = '0 6px 28px rgba(5,150,105,.28)';
         toast('✅ ส่งคำขอสำเร็จ! เจ้าหน้าที่จะโทรกลับภายใน 15 นาที', 5000, '#059669');
-        // ส่งจุดขอความช่วยเหลือไปแผนที่วิกฤตฝั่งกู้ภัย
+        // ส่งจุดขอความช่วยเหลือ + รายละเอียด ไปแผนที่วิกฤตฝั่งกู้ภัย
         var ll = parseLatLng(loc) || demoLatLng();
-        reportToCrisis(ll, 'help', 'ขอความช่วยเหลือ (' + ppl + ' คน)', loc);
+        var needs = [];
+        document.querySelectorAll('#pg-r .chip.sel').forEach(function (c) { needs.push(c.textContent.trim()); });
+        var note = document.getElementById('note').value.trim();
+        reportToCrisis(ll, 'help', 'ขอความช่วยเหลือ', loc, {
+          needs: needs, people: ppl, note: note, phone: phone, time: 'เมื่อกี้'
+        });
         setTimeout(function () {
           btn.innerHTML = '<i class="ti ti-send" style="font-size:20px"></i> ส่งคำขอความช่วยเหลือ';
           btn.disabled = false; btn.style.background = 'var(--red)'; btn.style.boxShadow = '0 6px 28px rgba(232,56,12,.28)';
@@ -3815,21 +3853,48 @@
         k === 'road' ? '🚗' : k === 'bridge' ? '🌉' : k === 'deep' ? '🌊' : k === 'block' ? '🚧' : '📍';
     }
 
+    function kindLabelTH(k) {
+      return k === 'sos' ? 'SOS ฉุกเฉิน' : k === 'help' ? 'ขอความช่วยเหลือ' :
+        k === 'road' ? 'ถนนรถเล็กผ่านไม่ได้' : k === 'bridge' ? 'สะพานชำรุด' :
+          k === 'deep' ? 'น้ำท่วมสูง' : k === 'block' ? 'เส้นทางปิด' : 'รายงาน';
+    }
+
     function crisisAddLive(r) {
       if (!crisisMapObj || !liveLayer) return;
       var c = liveColor(r.kind);
+      var d = r.detail || {};
       // วงความร้อนจุดใหม่
       L.circle(r.ll, { radius: 380, color: c, weight: 0, fillColor: c, fillOpacity: .30 }).addTo(liveLayer);
-      // หมุดกระพริบ (รายงานสด)
+
+      // สร้างการ์ดรายละเอียดสำหรับหน่วยกู้ภัย
+      var rows = '';
+      if (d.needs && d.needs.length)
+        rows += '<div class="pp-row"><span class="pp-k">ต้องการ:</span> <b style="color:' + c + '">' + d.needs.join(', ') + '</b></div>';
+      if (d.people)
+        rows += '<div class="pp-row"><span class="pp-k">จำนวน:</span> ' + d.people + ' คน</div>';
+      if (d.note)
+        rows += '<div class="pp-row"><span class="pp-k">รายละเอียด:</span> ' + d.note + '</div>';
+      if (d.phone)
+        rows += '<div class="pp-row"><span class="pp-k">ติดต่อ:</span> ' + d.phone + '</div>';
+      if (d.photo)
+        rows += '<div class="pp-row"><span class="pp-k">หลักฐาน:</span> 📷 มีรูปภาพแนบ</div>';
+      rows += '<div class="pp-row"><span class="pp-k">เวลา:</span> ' + (d.time || 'เมื่อกี้') + '</div>';
+
+      var popup =
+        '<div class="pp-card">' +
+        '<span class="pp-tag" style="color:' + c + '">' + liveEmoji(r.kind) + ' ' + (r.label || kindLabelTH(r.kind)) + '</span>' +
+        '<span class="pp-live">● รายงานสด</span>' +
+        '<div class="pp-where">📍 ' + r.where + '</div>' +
+        rows + '</div>';
+
       L.marker(r.ll, {
         icon: L.divIcon({ className: '', html: '<div class="pin-live" style="--c:' + c + '"></div>', iconSize: [16, 16], iconAnchor: [8, 8] })
-      }).addTo(liveLayer)
-        .bindPopup('<span class="pp-tag" style="color:' + c + '">' + liveEmoji(r.kind) + ' ' + r.label + ' (รายงานสด)</span><br><b>' + r.where + '</b>');
+      }).addTo(liveLayer).bindPopup(popup, { minWidth: 210 });
     }
 
-    // ฟังก์ชันกลาง — เรียกจากทุกการแจ้งของประชาชน
-    function reportToCrisis(ll, kind, label, where) {
-      var r = { ll: ll, kind: kind, label: label, where: where || (ll[0].toFixed(4) + ', ' + ll[1].toFixed(4)) };
+    // ฟังก์ชันกลาง — เรียกจากทุกการแจ้งของประชาชน (detail = รายละเอียดสำหรับกู้ภัย)
+    function reportToCrisis(ll, kind, label, where, detail) {
+      var r = { ll: ll, kind: kind, label: label, where: where || (ll[0].toFixed(4) + ', ' + ll[1].toFixed(4)), detail: detail || {} };
       liveReports.push(r);
 
       // อัปเดต KPI จำนวน SOS รอช่วยเหลือ (ฝั่งกู้ภัย)
@@ -4141,8 +4206,8 @@
         addCrowdMarker(hazType, ll, locTxt);
         crowdMapObj.flyTo(ll, 15, { duration: 1 });
       }
-      // ส่งจุดแจ้งเหตุไปแผนที่วิกฤตฝั่งกู้ภัยด้วย
-      reportToCrisis(ll, hazType, m.tag, locTxt);
+      // ส่งจุดแจ้งเหตุ + รายละเอียด ไปแผนที่วิกฤตฝั่งกู้ภัยด้วย
+      reportToCrisis(ll, hazType, m.tag, locTxt, { note: note, photo: !!photoData, time: 'เมื่อกี้' });
 
       // reset
       closeSheet();
