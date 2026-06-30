@@ -700,9 +700,9 @@
 
     .sugg {
       display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      padding: 11px 13px;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 13px;
       cursor: pointer;
       border-bottom: 1px solid rgba(255, 255, 255, .05);
       transition: background .12s
@@ -717,24 +717,73 @@
       background: rgba(14, 165, 233, .1)
     }
 
-    .sugg .ti {
-      font-size: 16px;
-      color: var(--blue);
-      flex-shrink: 0;
+    .sugg-ico {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: rgba(14, 165, 233, .1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .sugg-ico .ti {
+      font-size: 17px;
+      color: #38BDF8
+    }
+
+    .sugg-txt {
+      flex: 1;
+      min-width: 0
+    }
+
+    .sugg-pri {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--t0);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3
+    }
+
+    .sugg-pri b {
+      color: #7CC6F2;
+      font-weight: 800
+    }
+
+    .sugg-sec {
+      font-size: 11px;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       margin-top: 1px
     }
 
-    .sugg span {
-      font-size: 12.5px;
-      color: var(--t0);
-      line-height: 1.4
+    .sugg-cat {
+      font-size: 9.5px;
+      color: var(--t2);
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, .05);
+      border-radius: 5px;
+      padding: 2px 6px
     }
 
     .sugg-empty {
-      padding: 12px 13px;
+      padding: 14px 13px;
       font-size: 12px;
       color: var(--t2);
-      text-align: center
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .sugg-empty .ti {
+      font-size: 15px
     }
 
     .loc-confirm {
@@ -3534,20 +3583,20 @@
     ══════════════════════════════════════ */
     // สถานที่ตัวอย่างในกรุงเทพฯ (ใช้เป็น fallback เมื่อออฟไลน์/ค้นออนไลน์ไม่ได้)
     var SAMPLE_PLACES = [
-      { name: 'พระบรมมหาราชวัง / วัดพระแก้ว เขตพระนคร', ll: [13.7510, 100.4927] },
-      { name: 'สยามพารากอน เขตปทุมวัน', ll: [13.7466, 100.5347] },
-      { name: 'เซ็นทรัลเวิลด์ เขตปทุมวัน', ll: [13.7466, 100.5396] },
-      { name: 'อนุสาวรีย์ชัยสมรภูมิ เขตราชเทวี', ll: [13.7649, 100.5383] },
-      { name: 'สถานีกลางกรุงเทพอภิวัฒน์ (บางซื่อ)', ll: [13.8021, 100.5398] },
-      { name: 'ตลาดนัดจตุจักร เขตจตุจักร', ll: [13.7999, 100.5503] },
-      { name: 'มหาวิทยาลัยรามคำแหง เขตบางกะปิ', ll: [13.7556, 100.6206] },
-      { name: 'โรงพยาบาลรามาธิบดี เขตราชเทวี', ll: [13.7666, 100.5260] },
-      { name: 'ถนนสุขุมวิท (อโศก) เขตวัฒนา', ll: [13.7376, 100.5602] },
-      { name: 'ถนนเยาวราช เขตสัมพันธวงศ์', ll: [13.7400, 100.5100] },
-      { name: 'เขตบางกะปิ กรุงเทพมหานคร', ll: [13.7657, 100.6477] },
-      { name: 'เขตวังทองหลาง กรุงเทพมหานคร', ll: [13.7779, 100.6103] },
-      { name: 'ซอยลาดพร้าว 101 เขตบางกะปิ', ll: [13.7780, 100.6430] },
-      { name: 'ท่าอากาศยานดอนเมือง เขตดอนเมือง', ll: [13.9126, 100.6068] }
+      { primary: 'พระบรมมหาราชวัง / วัดพระแก้ว', secondary: 'ถนนหน้าพระลาน เขตพระนคร กรุงเทพฯ', cat: 'สถานที่ท่องเที่ยว', icon: 'ti-building-castle', ll: [13.7510, 100.4927] },
+      { primary: 'สยามพารากอน', secondary: 'ถนนพระรามที่ 1 เขตปทุมวัน กรุงเทพฯ', cat: 'ห้างสรรพสินค้า', icon: 'ti-building-store', ll: [13.7466, 100.5347] },
+      { primary: 'เซ็นทรัลเวิลด์', secondary: 'ถนนราชดำริ เขตปทุมวัน กรุงเทพฯ', cat: 'ห้างสรรพสินค้า', icon: 'ti-building-store', ll: [13.7466, 100.5396] },
+      { primary: 'อนุสาวรีย์ชัยสมรภูมิ', secondary: 'เขตราชเทวี กรุงเทพฯ', cat: 'สถานที่สำคัญ', icon: 'ti-map-pin', ll: [13.7649, 100.5383] },
+      { primary: 'สถานีกลางกรุงเทพอภิวัฒน์ (บางซื่อ)', secondary: 'ถนนกำแพงเพชร เขตจตุจักร กรุงเทพฯ', cat: 'สถานีรถไฟ', icon: 'ti-train', ll: [13.8021, 100.5398] },
+      { primary: 'ตลาดนัดจตุจักร', secondary: 'ถนนกำแพงเพชร 2 เขตจตุจักร กรุงเทพฯ', cat: 'ตลาด', icon: 'ti-building-store', ll: [13.7999, 100.5503] },
+      { primary: 'มหาวิทยาลัยรามคำแหง', secondary: 'ถนนรามคำแหง เขตบางกะปิ กรุงเทพฯ', cat: 'สถานศึกษา', icon: 'ti-school', ll: [13.7556, 100.6206] },
+      { primary: 'โรงพยาบาลรามาธิบดี', secondary: 'ถนนพระรามที่ 6 เขตราชเทวี กรุงเทพฯ', cat: 'โรงพยาบาล', icon: 'ti-building-hospital', ll: [13.7666, 100.5260] },
+      { primary: 'ถนนสุขุมวิท (อโศก)', secondary: 'เขตวัฒนา กรุงเทพฯ', cat: 'ถนน', icon: 'ti-road', ll: [13.7376, 100.5602] },
+      { primary: 'ถนนเยาวราช', secondary: 'เขตสัมพันธวงศ์ กรุงเทพฯ', cat: 'ถนน', icon: 'ti-road', ll: [13.7400, 100.5100] },
+      { primary: 'ซอยลาดพร้าว 101', secondary: 'ถนนลาดพร้าว เขตบางกะปิ กรุงเทพฯ', cat: 'ถนน/ซอย', icon: 'ti-road', ll: [13.7780, 100.6430] },
+      { primary: 'สำนักงานเขตบางกะปิ', secondary: 'เขตบางกะปิ กรุงเทพฯ', cat: 'หน่วยงาน', icon: 'ti-building', ll: [13.7657, 100.6477] },
+      { primary: 'สำนักงานเขตวังทองหลาง', secondary: 'เขตวังทองหลาง กรุงเทพฯ', cat: 'หน่วยงาน', icon: 'ti-building', ll: [13.7779, 100.6103] },
+      { primary: 'ท่าอากาศยานดอนเมือง', secondary: 'ถนนวิภาวดีรังสิต เขตดอนเมือง กรุงเทพฯ', cat: 'สนามบิน', icon: 'ti-plane', ll: [13.9126, 100.6068] }
     ];
     var geoSel = null, geoTimer = null, geoCache = {};
 
@@ -3557,36 +3606,125 @@
       toggleLocConfirm(q.length > 0);
       clearTimeout(geoTimer);
       if (parseLatLng(q)) { closeSuggest(); return; } // เป็นพิกัดอยู่แล้ว ไม่ต้องค้นหา
-      if (q.length < 3) { closeSuggest(); return; }
-      geoTimer = setTimeout(function () { searchPlaces(q); }, 550);
+      if (q.length < 2) { closeSuggest(); return; }
+      showSuggestLoading();
+      geoTimer = setTimeout(function () { searchPlaces(q); }, 480);
+    }
+
+    function showSuggestLoading() {
+      var box = document.getElementById('locSuggest');
+      box.innerHTML = '<div class="sugg-empty"><i class="ti ti-loader"></i> กำลังค้นหาสถานที่...</div>';
+      box.style.display = 'block';
+    }
+
+    // เลือกไอคอนตามประเภทสถานที่ (เหมือน Google Maps)
+    function placeIcon(it) {
+      var c = it.class || it.category, t = it.type, at = it.addresstype;
+      if (c === 'highway' || at === 'road') return 'ti-road';
+      if (c === 'amenity') {
+        if (t === 'hospital' || t === 'clinic' || t === 'doctors') return 'ti-building-hospital';
+        if (t === 'school' || t === 'university' || t === 'college' || t === 'kindergarten') return 'ti-school';
+        if (t === 'place_of_worship') return 'ti-building-church';
+        if (t === 'restaurant' || t === 'cafe' || t === 'fast_food' || t === 'food_court') return 'ti-tools-kitchen-2';
+        if (t === 'fuel') return 'ti-gas-station';
+        if (t === 'bank' || t === 'atm') return 'ti-building-bank';
+        if (t === 'police') return 'ti-shield';
+        if (t === 'marketplace') return 'ti-building-store';
+        if (t === 'pharmacy') return 'ti-first-aid-kit';
+        return 'ti-building-community';
+      }
+      if (c === 'shop') return 'ti-building-store';
+      if (c === 'railway' || t === 'station' || t === 'subway') return 'ti-train';
+      if (c === 'aeroway') return 'ti-plane';
+      if (c === 'building') return 'ti-building';
+      if (c === 'tourism') return 'ti-camera';
+      if (c === 'leisure') return 'ti-ball-football';
+      if (c === 'office') return 'ti-briefcase';
+      if (c === 'place') {
+        if (t === 'house' || t === 'building') return 'ti-home';
+        if (t === 'city' || t === 'town' || t === 'suburb' || t === 'neighbourhood' || t === 'quarter' || t === 'village') return 'ti-map-2';
+        return 'ti-map-pin';
+      }
+      return 'ti-map-pin';
+    }
+
+    // แปลประเภทเป็นป้ายภาษาไทยสั้น ๆ
+    function placeCat(it) {
+      var c = it.class, t = it.type, at = it.addresstype;
+      if (c === 'highway' || at === 'road') return 'ถนน';
+      if (t === 'hospital' || t === 'clinic') return 'โรงพยาบาล';
+      if (t === 'school' || t === 'university' || t === 'college') return 'สถานศึกษา';
+      if (t === 'place_of_worship') return 'ศาสนสถาน';
+      if (c === 'shop' || t === 'marketplace') return 'ร้านค้า';
+      if (c === 'railway' || t === 'station') return 'สถานี';
+      if (c === 'aeroway') return 'สนามบิน';
+      if (c === 'tourism') return 'ท่องเที่ยว';
+      if (c === 'amenity') return 'สถานที่';
+      if (c === 'place') {
+        if (t === 'suburb' || t === 'neighbourhood' || t === 'quarter') return 'ย่าน';
+        if (t === 'city' || t === 'town') return 'เมือง';
+      }
+      return '';
+    }
+
+    // แยกชื่อหลัก/ที่อยู่รอง จากผลลัพธ์ Nominatim
+    function splitName(it) {
+      var parts = (it.display_name || '').split(', ');
+      var primary = it.name && it.name.trim() ? it.name.trim() : parts.shift();
+      if (it.name && parts.length && parts[0] === it.name) parts.shift();
+      var secondary = parts.join(', ');
+      return { primary: primary || it.display_name, secondary: secondary };
     }
 
     function searchPlaces(q) {
       if (typeof fetch === 'function' && navigator.onLine !== false && window.isSecureContext) {
-        var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=th&accept-language=th&q=' + encodeURIComponent(q);
+        var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&dedupe=1&limit=8&countrycodes=th&accept-language=th&q=' + encodeURIComponent(q);
         fetch(url).then(function (r) { return r.json(); }).then(function (list) {
           if (!list || !list.length) { fallbackSuggest(q); return; }
           renderSuggest(list.map(function (it) {
-            return { name: it.display_name, lat: parseFloat(it.lat), lon: parseFloat(it.lon) };
-          }));
+            var nm = splitName(it);
+            return { primary: nm.primary, secondary: nm.secondary, cat: placeCat(it), icon: placeIcon(it), lat: parseFloat(it.lat), lon: parseFloat(it.lon) };
+          }), q);
         }).catch(function () { fallbackSuggest(q); });
       } else { fallbackSuggest(q); }
     }
 
     function fallbackSuggest(q) {
       var ql = q.toLowerCase();
-      var hits = SAMPLE_PLACES.filter(function (p) { return p.name.toLowerCase().indexOf(ql) >= 0; });
+      var hits = SAMPLE_PLACES.filter(function (p) {
+        return (p.primary + ' ' + p.secondary).toLowerCase().indexOf(ql) >= 0;
+      });
       if (!hits.length) hits = SAMPLE_PLACES.slice(0, 6);
-      renderSuggest(hits.map(function (p) { return { name: p.name, lat: p.ll[0], lon: p.ll[1] }; }));
+      renderSuggest(hits.map(function (p) {
+        return { primary: p.primary, secondary: p.secondary, cat: p.cat, icon: p.icon, lat: p.ll[0], lon: p.ll[1] };
+      }), q);
     }
 
-    function renderSuggest(items) {
+    function hili(text, q) {
+      if (!text || !q) return text || '';
+      try {
+        var esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.replace(new RegExp('(' + esc + ')', 'ig'), '<b>$1</b>');
+      } catch (e) { return text; }
+    }
+
+    function renderSuggest(items, q) {
       var box = document.getElementById('locSuggest');
       geoCache = {};
-      if (!items.length) { box.innerHTML = '<div class="sugg-empty">ไม่พบสถานที่ที่ตรงกัน</div>'; box.style.display = 'block'; return; }
+      if (!items.length) {
+        box.innerHTML = '<div class="sugg-empty"><i class="ti ti-map-off"></i> ไม่พบสถานที่ที่ตรงกัน</div>';
+        box.style.display = 'block'; return;
+      }
       box.innerHTML = items.map(function (it, i) {
         geoCache[i] = it;
-        return '<div class="sugg" onclick="pickPlace(' + i + ')"><i class="ti ti-map-pin"></i><span>' + it.name + '</span></div>';
+        return '<div class="sugg" onclick="pickPlace(' + i + ')">' +
+          '<div class="sugg-ico"><i class="ti ' + (it.icon || 'ti-map-pin') + '"></i></div>' +
+          '<div class="sugg-txt">' +
+          '<div class="sugg-pri">' + hili(it.primary, q) + '</div>' +
+          (it.secondary ? '<div class="sugg-sec">' + it.secondary + '</div>' : '') +
+          '</div>' +
+          (it.cat ? '<div class="sugg-cat">' + it.cat + '</div>' : '') +
+          '</div>';
       }).join('');
       box.style.display = 'block';
     }
@@ -3594,8 +3732,9 @@
     function pickPlace(i) {
       var it = geoCache[i];
       if (!it) return;
-      geoSel = { lat: it.lat, lon: it.lon, name: it.name };
-      document.getElementById('loc').value = it.name;
+      var full = it.primary + (it.secondary ? ', ' + it.secondary : '');
+      geoSel = { lat: it.lat, lon: it.lon, name: full };
+      document.getElementById('loc').value = full;
       closeSuggest();
       toggleLocConfirm(true);
     }
@@ -3618,7 +3757,7 @@
     function fallbackOne(q) {
       var ql = q.toLowerCase();
       for (var i = 0; i < SAMPLE_PLACES.length; i++) {
-        if (SAMPLE_PLACES[i].name.toLowerCase().indexOf(ql) >= 0) return SAMPLE_PLACES[i].ll;
+        if ((SAMPLE_PLACES[i].primary + ' ' + SAMPLE_PLACES[i].secondary).toLowerCase().indexOf(ql) >= 0) return SAMPLE_PLACES[i].ll;
       }
       return demoLatLng();
     }
