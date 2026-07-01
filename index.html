@@ -1999,6 +1999,32 @@
       margin: 8px auto 14px
     }
 
+    .sheet-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid var(--b0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+      transition: background .15s
+    }
+
+    .sheet-close:active {
+      background: rgba(255, 255, 255, .16)
+    }
+
+    .sheet-close .ti {
+      font-size: 20px;
+      color: var(--t0)
+    }
+
     .sheet h3 {
       font-size: 19px;
       font-weight: 800;
@@ -3434,6 +3460,9 @@
     <div id="shBg" class="sheet-bg" onclick="closeShelterRoute()"></div>
     <div id="shSheet" class="sheet" role="dialog" aria-modal="true" aria-label="เส้นทางไปศูนย์พักพิง">
       <div class="sheet-grip"></div>
+      <button class="sheet-close" onclick="closeShelterRoute()" aria-label="ปิด">
+        <i class="ti ti-x"></i>
+      </button>
       <h3 id="shTitle">เส้นทางไปศูนย์พักพิง</h3>
       <div class="sheet-sub" id="shSub">นำทางจากตำแหน่งของคุณ</div>
 
