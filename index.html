@@ -5,8 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ช่วยน้ำท่วม">
   <meta name="theme-color" content="#050D1A">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <title>ช่วยน้ำท่วม — ระบบแจ้งเหตุฉุกเฉิน</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2604,6 +2609,40 @@
       transform: translateX(-50%) translateY(0)
     }
 
+    /* network / background-sync banner */
+    .net-banner {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: calc(env(safe-area-inset-bottom) + 74px);
+      z-index: 350;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .4)
+    }
+
+    .net-banner .ti {
+      font-size: 15px
+    }
+
+    .net-banner.off {
+      background: rgba(120, 53, 15, .95);
+      color: #FDE68A;
+      border: 1px solid rgba(245, 158, 11, .4)
+    }
+
+    .net-banner.sync {
+      background: rgba(12, 74, 110, .95);
+      color: #BAE6FD;
+      border: 1px solid rgba(14, 165, 233, .4)
+    }
+
     /* ══════════════════════════════════════
    SOS MODAL
 ══════════════════════════════════════ */
@@ -3388,6 +3427,9 @@
     <!-- TOAST -->
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+    <!-- NETWORK / SYNC BANNER -->
+    <div id="netBanner" class="net-banner" style="display:none" role="status" aria-live="polite"></div>
+
     <!-- SOS OVERLAY -->
     <div id="ov" class="overlay" role="dialog" aria-modal="true" aria-label="ยืนยัน SOS">
       <div class="ov-ring"><i class="ti ti-sos"></i></div>
@@ -3561,24 +3603,29 @@
     function confirmSOS() {
       closeOv();
       if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
-      toast('🆘 ส่งสัญญาณ SOS แล้ว! เจ้าหน้าที่กำลังมา...', 5000, '#E8380C');
+      toast('🆘 กำลังส่งสัญญาณ SOS...', 3000, '#E8380C');
+
+      // เมื่อได้พิกัดแล้ว: ออนไลน์=ส่งทันที / ออฟไลน์=เก็บคิวส่งอัตโนมัติเมื่อมีเน็ต
+      var handle = function (ll, approx) {
+        var where = 'ตำแหน่งผู้กด SOS' + (approx ? ' (โดยประมาณ)' : '');
+        var detail = { note: 'สัญญาณขอความช่วยเหลือฉุกเฉิน', time: 'เมื่อกี้' };
+        if (!navigator.onLine) {
+          enqueueRequest({ ll: ll, kind: 'sos', label: 'SOS ฉุกเฉิน', where: where, detail: detail });
+          setTimeout(function () { toast('📴 ไม่มีเน็ต — เก็บสัญญาณ SOS ไว้ ระบบจะส่งอัตโนมัติทันทีที่มีสัญญาณ', 6000, '#D97706'); }, 800);
+        } else {
+          reportToCrisis(ll, 'sos', 'SOS ฉุกเฉิน', where, detail);
+          setTimeout(function () { toast('📍 ส่งสัญญาณ SOS + พิกัดให้ศูนย์กู้ภัยแล้ว', 4000, '#0EA5E9'); }, 1000);
+        }
+      };
+
       if (navigator.geolocation && window.isSecureContext) {
         navigator.geolocation.getCurrentPosition(
-          function (p) {
-            var lat = p.coords.latitude, lng = p.coords.longitude;
-            reportToCrisis([lat, lng], 'sos', 'SOS ฉุกเฉิน', 'ตำแหน่งผู้กด SOS');
-            setTimeout(function () { toast('📍 ส่งพิกัด ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + ' ให้เจ้าหน้าที่แล้ว', 4000, '#0EA5E9'); }, 1200);
-          },
-          function () {
-            reportToCrisis(demoLatLng(), 'sos', 'SOS ฉุกเฉิน', 'ตำแหน่งผู้กด SOS (โดยประมาณ)');
-            setTimeout(function () { toast('📍 ส่งสัญญาณ SOS ให้ศูนย์กู้ภัยแล้ว (ตำแหน่งโดยประมาณ)', 4000, '#0EA5E9'); }, 1200);
-          },
+          function (p) { handle([p.coords.latitude, p.coords.longitude], false); },
+          function () { handle(demoLatLng(), true); },
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
       } else {
-        // โหมดตัวอย่าง (file://) — ส่งตำแหน่งโดยประมาณไปแผนที่วิกฤต
-        reportToCrisis(demoLatLng(), 'sos', 'SOS ฉุกเฉิน', 'ตำแหน่งผู้กด SOS (โดยประมาณ)');
-        setTimeout(function () { toast('📍 ส่งสัญญาณ SOS ให้ศูนย์กู้ภัยแล้ว', 4000, '#0EA5E9'); }, 1200);
+        handle(demoLatLng(), true);
       }
     }
     document.getElementById('ov').addEventListener('click', function (e) { if (e.target === this) closeOv(); });
@@ -3876,23 +3923,36 @@
       var btn = document.getElementById('subbtn');
       btn.innerHTML = '<i class="ti ti-loader" style="font-size:20px"></i> กำลังส่ง...';
       btn.disabled = true;
+
+      // เตรียมข้อมูลคำขอ
+      var ll = parseLatLng(loc) || demoLatLng();
+      var needs = [];
+      document.querySelectorAll('#pg-r .chip.sel').forEach(function (c) { needs.push(c.textContent.trim()); });
+      var note = document.getElementById('note').value.trim();
+      var detail = { needs: needs, people: ppl, note: note, phone: phone, time: 'เมื่อกี้' };
+
+      var resetBtn = function () {
+        btn.innerHTML = '<i class="ti ti-send" style="font-size:20px"></i> ส่งคำขอความช่วยเหลือ';
+        btn.disabled = false; btn.style.background = 'var(--red)'; btn.style.boxShadow = '0 6px 28px rgba(232,56,12,.28)';
+      };
+
       setTimeout(function () {
+        if (!navigator.onLine) {
+          // ── ออฟไลน์: เก็บคำขอไว้ในคิว ส่งอัตโนมัติเมื่อมีเน็ต (Background Sync) ──
+          enqueueRequest({ ll: ll, kind: 'help', label: 'ขอความช่วยเหลือ', where: loc, detail: detail });
+          btn.innerHTML = '<i class="ti ti-cloud-lock" style="font-size:20px"></i> เก็บคำขอไว้แล้ว (ออฟไลน์)';
+          btn.style.background = 'var(--amber)'; btn.style.boxShadow = '0 6px 28px rgba(245,158,11,.28)';
+          toast('📴 ไม่มีเน็ต — บันทึกคำขอไว้ ระบบจะส่งให้อัตโนมัติเมื่อมีสัญญาณ', 5500, '#D97706');
+          setTimeout(resetBtn, 4000);
+          return;
+        }
+        // ── ออนไลน์: ส่งทันที ──
         btn.innerHTML = '<i class="ti ti-circle-check" style="font-size:20px"></i> ส่งสำเร็จแล้ว!';
         btn.style.background = 'var(--green)';
         btn.style.boxShadow = '0 6px 28px rgba(5,150,105,.28)';
         toast('✅ ส่งคำขอสำเร็จ! เจ้าหน้าที่จะโทรกลับภายใน 15 นาที', 5000, '#059669');
-        // ส่งจุดขอความช่วยเหลือ + รายละเอียด ไปแผนที่วิกฤตฝั่งกู้ภัย
-        var ll = parseLatLng(loc) || demoLatLng();
-        var needs = [];
-        document.querySelectorAll('#pg-r .chip.sel').forEach(function (c) { needs.push(c.textContent.trim()); });
-        var note = document.getElementById('note').value.trim();
-        reportToCrisis(ll, 'help', 'ขอความช่วยเหลือ', loc, {
-          needs: needs, people: ppl, note: note, phone: phone, time: 'เมื่อกี้'
-        });
-        setTimeout(function () {
-          btn.innerHTML = '<i class="ti ti-send" style="font-size:20px"></i> ส่งคำขอความช่วยเหลือ';
-          btn.disabled = false; btn.style.background = 'var(--red)'; btn.style.boxShadow = '0 6px 28px rgba(232,56,12,.28)';
-        }, 4000);
+        reportToCrisis(ll, 'help', 'ขอความช่วยเหลือ', loc, detail);
+        setTimeout(resetBtn, 4000);
       }, 1600);
     }
 
@@ -4566,6 +4626,151 @@
 
     /* ── CLOCK ── */
     /* นำแถบเวลาจำลองด้านบนออกแล้ว ไม่ต้องอัปเดตนาฬิกาอีกต่อไป */
+
+    /* ══════════════════════════════════════════════════════
+       PWA — Service Worker + คิวออฟไลน์ + Background Sync
+    ══════════════════════════════════════════════════════ */
+
+    // ── สถานะคิวคำขอที่รอส่ง ──
+    var pendingQueue = [];        // เก็บในหน่วยความจำ (session)
+    var IDB_OK = ('indexedDB' in window);
+
+    // IndexedDB helper (คงคิวไว้แม้ปิดแอป) — มี fallback เป็น in-memory
+    function idbOpen() {
+      return new Promise(function (res, rej) {
+        try {
+          var r = indexedDB.open('floodhelp', 1);
+          r.onupgradeneeded = function () { r.result.createObjectStore('queue', { keyPath: 'id', autoIncrement: true }); };
+          r.onsuccess = function () { res(r.result); };
+          r.onerror = function () { rej(r.error); };
+        } catch (e) { rej(e); }
+      });
+    }
+    function idbAdd(item) {
+      if (!IDB_OK) return Promise.resolve();
+      return idbOpen().then(function (db) {
+        return new Promise(function (res) {
+          var tx = db.transaction('queue', 'readwrite');
+          tx.objectStore('queue').add(item); tx.oncomplete = res; tx.onerror = res;
+        });
+      }).catch(function () { });
+    }
+    function idbLoad() {
+      if (!IDB_OK) return Promise.resolve([]);
+      return idbOpen().then(function (db) {
+        return new Promise(function (res) {
+          var tx = db.transaction('queue', 'readonly');
+          var rq = tx.objectStore('queue').getAll();
+          rq.onsuccess = function () { res(rq.result || []); };
+          rq.onerror = function () { res([]); };
+        });
+      }).catch(function () { return []; });
+    }
+    function idbClear() {
+      if (!IDB_OK) return Promise.resolve();
+      return idbOpen().then(function (db) {
+        return new Promise(function (res) {
+          var tx = db.transaction('queue', 'readwrite');
+          tx.objectStore('queue').clear(); tx.oncomplete = res; tx.onerror = res;
+        });
+      }).catch(function () { });
+    }
+
+    // ── เพิ่มคำขอเข้าคิว (เมื่อออฟไลน์) ──
+    function enqueueRequest(item) {
+      item.ts = Date.now();
+      pendingQueue.push(item);
+      idbAdd(item);
+      registerBgSync();
+      updateBanner();
+    }
+
+    // ── ขอ Background Sync (ให้เบราว์เซอร์ส่งให้อัตโนมัติเมื่อมีเน็ต) ──
+    function registerBgSync() {
+      if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then(function (reg) {
+          reg.sync.register('sync-sos').catch(function () { });
+        }).catch(function () { });
+      }
+    }
+
+    // ── ส่งคำขอที่ค้างไว้เมื่อกลับมาออนไลน์ ──
+    var flushing = false;
+    function flushQueue() {
+      if (flushing || !navigator.onLine) return;
+      // รวมคิวจาก IndexedDB (กรณีเพิ่งเปิดแอป) เข้ากับในหน่วยความจำ
+      idbLoad().then(function (stored) {
+        var all = pendingQueue.slice();
+        stored.forEach(function (s) {
+          if (!all.some(function (a) { return a.ts === s.ts && a.kind === s.kind; })) all.push(s);
+        });
+        if (!all.length) { updateBanner(); return; }
+        flushing = true;
+        updateBanner(true);
+        // จำลองการส่งไปเซิร์ฟเวอร์หลังบ้าน (ดีเลย์สั้น ๆ)
+        setTimeout(function () {
+          all.forEach(function (it) {
+            // เมื่อส่งสำเร็จ → แสดงจุดบนแผนที่วิกฤตฝั่งกู้ภัย
+            if (typeof reportToCrisis === 'function') {
+              reportToCrisis(it.ll, it.kind, it.label, it.where, it.detail || {});
+            }
+          });
+          pendingQueue = [];
+          idbClear();
+          flushing = false;
+          updateBanner();
+          toast('📡 ส่งคำขอที่ค้างไว้ ' + all.length + ' รายการให้ศูนย์กู้ภัยแล้ว', 4500, '#0EA5E9');
+        }, 1200);
+      });
+    }
+
+    // ── แถบสถานะเครือข่าย / การส่งค้าง ──
+    function updateBanner(isSyncing) {
+      var b = document.getElementById('netBanner');
+      if (!b) return;
+      var online = navigator.onLine;
+      var n = pendingQueue.length;
+      if (isSyncing) {
+        b.className = 'net-banner sync';
+        b.innerHTML = '<i class="ti ti-cloud-upload"></i> กำลังส่งคำขอที่ค้างไว้...';
+        b.style.display = 'flex'; return;
+      }
+      if (!online && n > 0) {
+        b.className = 'net-banner off';
+        b.innerHTML = '<i class="ti ti-wifi-off"></i> ออฟไลน์ · มี ' + n + ' คำขอ จะส่งอัตโนมัติเมื่อมีเน็ต';
+        b.style.display = 'flex';
+      } else if (!online) {
+        b.className = 'net-banner off';
+        b.innerHTML = '<i class="ti ti-wifi-off"></i> ออฟไลน์ · แอปยังใช้งานได้ตามปกติ';
+        b.style.display = 'flex';
+      } else if (n > 0) {
+        b.className = 'net-banner sync';
+        b.innerHTML = '<i class="ti ti-clock"></i> มี ' + n + ' คำขอรอส่ง';
+        b.style.display = 'flex';
+      } else {
+        b.style.display = 'none';
+      }
+    }
+
+    // ── ลงทะเบียน Service Worker + ฟังเหตุการณ์เครือข่าย ──
+    (function initPWA() {
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js').catch(function () { });
+        });
+        navigator.serviceWorker.addEventListener('message', function (ev) {
+          if (ev.data && ev.data.type === 'flush-sos') flushQueue();
+        });
+      }
+      window.addEventListener('online', function () { updateBanner(); flushQueue(); });
+      window.addEventListener('offline', function () { updateBanner(); });
+      // โหลดคิวที่ค้างจากครั้งก่อน แล้วลองส่งถ้ามีเน็ต
+      idbLoad().then(function (stored) {
+        if (stored && stored.length) { pendingQueue = stored.slice(); }
+        updateBanner();
+        if (navigator.onLine) setTimeout(flushQueue, 1500);
+      });
+    })();
   </script>
 </body>
 
